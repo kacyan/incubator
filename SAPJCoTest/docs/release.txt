@@ -1,0 +1,17 @@
+[2013/02/21] Kac
+(1)サービスクラス(I/F)作成時にパッケージ名を指定できるよう改良してみた
+　WebContent/bapiDataClass.jsp
+　WebContent/bapiServiceClass.jsp
+　WebContent/bapiParameter.jsp
+　WebContent/recordMetaData.jsp
+
+[2013/02/15] Kac
+(1)BAPIのメタデータから、サービスクラス(I/F)とデータクラスの雛型を作ってみた
+　WebContent/bapiDataClass.jsp
+　WebContent/bapiServiceClass.jsp
+　WebContent/bapiParameter.jsp
+　WebContent/recordMetaData.jsp
+
+[2013/02/14] Kac
+SAPJCoの習作
+初版リリース

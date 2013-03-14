@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="SAPTest" default="build" basedir=".">
+
+  <property name="prj_ver" value="1.0.0" />
+  <property name="web_src" value="WebContent" />
+  <property name="war_dir" value="webapps" />
+  <property name="src" value="src"/>
+  <property name="cls" value="WebContent/WEB-INF/classes" />
+  <property name="doc" value="docs" />
+  <property name="lib" value="WebContent/WEB-INF/lib" />
+  <property name="extlib" value="extlib" />
+  <property name="dist" value="dist"/>
+
+  <target name="init">
+    <!-- Create the time stamp -->
+    <tstamp/>
+  </target>
+
+	<target name="build" depends="init">
+    <mkdir dir="${cls}" />
+  	<javac srcdir="${src}" destdir="${cls}" debug="on">
+      <classpath>
+        <fileset dir="${lib}">
+          <include name="*.jar" />
+        </fileset>
+        <fileset dir="${extlib}">
+          <include name="*.jar" />
+        </fileset>
+      </classpath>
+  	</javac>
+    <native2ascii encoding="SJIS"
+      src="${src}" dest="${cls}"
+      includes="**/*.properties" ext=".properties" />
+  </target>
+
+	<!-- =================================
+          target: ardbeg/SAPTest.war
+         ================================= -->
+    <target name="ardbeg/SAPTest.war" depends="build" description="cerate ardbeg/SAPTest.war">
+    	<mkdir dir="${war_dir}/ardbeg/META-INF"/>
+        <manifest file="${war_dir}/ardbeg/META-INF/MANIFEST.MF">
+            <attribute name="Built-By" value="KSI"/>
+            <attribute name="Specification-Title" value="SAPTest"/>
+            <attribute name="Specification-Version" value="${prj_ver}"/>
+            <attribute name="Specification-Vendor" value="KSI"/>
+            <attribute name="Implementation-Title" value="SAPTest for ardbeg"/>
+            <attribute name="Implementation-Version" value="${DSTAMP}"/>
+            <attribute name="Implementation-Vendor" value="KSI"/>
+        </manifest>
+    	<war destfile="${war_dir}/ardbeg/SAPTest.war"
+    		basedir="${web_src}"
+    		excludes="**/CVS/**, **/web**.xml, META-INF/**, **/*.properties, WEB-INF/lib/sapjco*.*"
+    		>
+    		<metainf dir="${war_dir}/ardbeg/META-INF" />
+    		<webinf dir="${war_dir}/ardbeg/WEB-INF" />
+    	</war>
+    </target>
+
+  <!-- dist -->
+  <target name="dist" depends="build"
+    description="distoribute ${dist_dir}" >
+
+    <copy todir="${dist}/${ant.project.name}">
+      <fileset dir="."
+        includes="**.*, .settings/**, ${src}/**, ${doc}/**, ${extlib}/**, ${web_src}/**, ${war_dir}/**, misc/**" />
+    </copy>
+
+    <zip zipfile="${dist}/${ant.project.name}-${prj_ver}-${DSTAMP}.zip"
+         basedir="${dist}"
+         includes="${ant.project.name}/**/**.*" />
+    <delete dir="${dist}/${ant.project.name}" />
+
+  </target>
+
+</project>

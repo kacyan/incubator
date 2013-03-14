@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Ant-Version: Apache Ant 1.8.2
+Created-By: 1.7.0_17-b02 (Oracle Corporation)
+Built-By: KSI
+Specification-Title: SAPTest
+Specification-Version: 1.0.0
+Specification-Vendor: KSI
+Implementation-Title: SAPTest for ardbeg
+Implementation-Version: 20130307
+Implementation-Vendor: KSI
+
