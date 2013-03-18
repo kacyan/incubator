@@ -24,7 +24,7 @@
 
   <listener>
    <description>Context Initializer</description>
-   <listener-class>jp.co.ksi.eip.commons.servlet.InitContextListener</listener-class>
+   <listener-class>jp.co.ksi.sap.incubator.SAPInitContextListener</listener-class>
   </listener>
 
   <servlet>

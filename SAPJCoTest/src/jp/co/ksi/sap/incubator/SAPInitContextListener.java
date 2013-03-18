@@ -4,7 +4,6 @@ import javax.servlet.ServletContextEvent;
 
 import org.apache.log4j.Logger;
 
-import com.sap.conn.jco.ext.DestinationDataProvider;
 import com.sap.conn.jco.ext.Environment;
 
 import jp.co.ksi.eip.commons.servlet.InitContextListener;
@@ -13,7 +12,7 @@ import jp.co.ksi.eip.commons.servlet.InitContextListener;
  * JCo環境の初期化を行います。
  * @author kac
  * @since 2013/03/07
- * @version 2013/03/14
+ * @version 2013/03/18
  */
 public class SAPInitContextListener extends InitContextListener
 {
@@ -30,7 +29,9 @@ public class SAPInitContextListener extends InitContextListener
 		}
 		else
 		{//	カスタム・プロバイダを登録する
-			DestinationDataProvider	ddProvider= new SSODestinationDataProvider();
+			SSODestinationDataProvider	ddProvider= new SSODestinationDataProvider();
+			ddProvider.setLang( "ja" );
+			
 			try
 			{
 				Environment.registerDestinationDataProvider( ddProvider );

@@ -1,10 +1,10 @@
+<%@page import="jp.co.ksi.sap.incubator.bl.Login"%>
 <%@page import="com.sap.conn.jco.JCoRecordMetaData"%>
 <%@page import="com.sap.conn.jco.JCoExtendedFieldMetaData"%>
 <%@page import="com.sap.conn.jco.JCoFunctionTemplate"%>
 <%@page import="com.sap.conn.jco.JCoListMetaData"%>
 <%@page import="java.io.PrintWriter"%>
 <%@page import="com.sap.conn.jco.JCoMetaData"%>
-<%@page import="jp.co.ksi.sap.incubator.TestKac"%>
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
 <%@page import="com.sap.conn.jco.JCoParameterList"%>
 <%@page import="com.sap.conn.jco.JCoFunction"%>
@@ -32,8 +32,12 @@ String	jcoDestinationFile= appConfig.getProperty( "jcoDestinationFile", "sap" );
 if( functionName.equals("") )	return;
 try
 {
-	//	実行時カレントフォルダの sap.jcoDestication というファイルから接続情報を読み込む
-	JCoDestination	destination= JCoDestinationManager.getDestination( jcoDestinationFile );
+	//	セッションから取得する
+	JCoDestination	destination= (JCoDestination)session.getAttribute( Login.SESS_ATTR_NAME_AUTH );
+	if( destination == null )
+	{
+		pageContext.forward( "jcoLogin.jsp" );
+	}
 
 	//	functionName には汎用モジュール名を指定する
 	JCoFunction	function= destination.getRepository().getFunction( functionName );

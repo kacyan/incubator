@@ -1,3 +1,5 @@
+<%@page import="jp.co.ksi.sap.incubator.bl.Login"%>
+<%@page import="com.sap.conn.jco.JCoCustomDestination"%>
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
 <%@ page import="com.sap.conn.jco.JCoTable"%>
 <%@ page import="com.sap.conn.jco.JCoStructure"%>
@@ -9,7 +11,6 @@
 <%@ page import="com.sap.conn.jco.JCoListMetaData"%>
 <%@ page import="java.io.PrintWriter"%>
 <%@ page import="com.sap.conn.jco.JCoMetaData"%>
-<%@ page import="jp.co.ksi.sap.incubator.TestKac"%>
 <%@ page import="com.sap.conn.jco.JCoParameterList"%>
 <%@ page import="com.sap.conn.jco.JCoFunction"%>
 <%@ page import="com.sap.conn.jco.JCoDestinationManager"%>
@@ -25,35 +26,10 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head>
 <body>
-<bean:parameter name="host" id="host" value=""/>
-<bean:parameter name="systemNumber" id="systemNumber" value=""/>
-<bean:parameter name="clientNumber" id="clientNumber" value=""/>
-<bean:parameter name="uid" id="uid" value=""/>
-<bean:parameter name="pwd" id="pwd" value=""/>
 <bean:parameter name="functionName" id="functionName" value=""/>
 <bean:parameter name="submit" id="submit" value=""/>
 <form action="" method="post">
 <table>
- <tr>
-  <th>サーバ</th>
-  <td><input type="text" name="host" value="<bean:write name="host"/>" size="40"></td>
- </tr>
- <tr>
-  <th>システム番号</th>
-  <td><input type="text" name="systemNumber" value="<bean:write name="systemNumber"/>" size="4"></td>
- </tr>
- <tr>
-  <th>クライアント番号</th>
-  <td><input type="text" name="clientNumber" value="<bean:write name="clientNumber"/>" size="4"></td>
- </tr>
- <tr>
-  <th>ユーザ</th>
-  <td><input type="text" name="uid" value="<bean:write name="uid"/>" size="20"></td>
- </tr>
- <tr>
-  <th>パスワード</th>
-  <td><input type="password" name="pwd" value="<bean:write name="pwd"/>" size="20"></td>
- </tr>
  <tr>
   <th>汎用モジュール名</th>
   <td><input type="text" name="functionName" value="<bean:write name="functionName"/>" size="40"></td>
@@ -62,17 +38,15 @@
 <input type="submit" name="submit" value="getImportParameterList">
 <hr/>
 <%
-if( host.equals("") )	return;
-if( systemNumber.equals("") )	return;
-if( clientNumber.equals("") )	return;
-if( uid.equals("") )	return;
-if( pwd.equals("") )	return;
 if( functionName.equals("") )	return;
-String	destinationName= ":"+ host +":"+ systemNumber +":"+ clientNumber +":"+ uid +":"+ pwd;
 try
 {
-	//	実行時カレントフォルダの sap.jcoDestication というファイルから接続情報を読み込む
-	JCoDestination	destination= JCoDestinationManager.getDestination( destinationName );
+	//	セッションのdestinationを取得する
+	JCoDestination	destination= (JCoDestination)session.getAttribute( Login.SESS_ATTR_NAME_AUTH );
+	if( destination == null )
+	{
+		pageContext.forward( "jcoLogin.jsp" );
+	}
 
 	//	functionName には汎用モジュール名を指定する
 	JCoFunction	function= destination.getRepository().getFunction( functionName );

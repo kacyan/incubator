@@ -4,6 +4,8 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
+import com.sap.conn.jco.JCoCustomDestination;
+import com.sap.conn.jco.JCoCustomDestination.UserData;
 import com.sap.conn.jco.JCoDestination;
 import com.sap.conn.jco.JCoDestinationManager;
 import com.sap.conn.jco.JCoFunction;
@@ -16,27 +18,29 @@ import com.sap.conn.jco.ext.Environment;
  * ssoTicketを扱うために DestinationDataProvider を拡張してみる
  * @author kac
  * @since 2013/03/12
- * @version 2013/03/12
+ * @version 2013/03/15
  * <pre>
- * [使い方]
+ * [チケット取得方法]
  * １．SSODestinationDataProvider を生成する
  * ２．Environment.registerDestinationDataProvider()で登録する
- * ３．JCoDestinationManager.getDestination( destinationName )を呼ぶ。
- * 　destinationName は、${type}:${host}:${systemNumber}:${clientNumber}:${uid}:${pwd} という文字列
- * ４．得られたJCoDestinationを使ってRFC呼出を行う。
+ * ３．JCoDestinationManager.getDestination( destinationName )を呼ぶ(チケット発行要求)
+ * 　destinationName は、GETSSO2:${host}:${systemNumber}:${clientNumber}:${uid}:${pwd} という文字列
+ * ４．得られたJCoDestinationからssoTicketを取得する
  * ５．Environment.unregisterDestinationDataProvider()で登録を解除する
  * 
- * ※destinationには終了処理が無い。
- * JCoDestinationのJavadocによると、
- * 　JCoDestinationは、JCoランタイムがコネクションを生成するのために必要な情報を持っているだけ。
- * 　それ自身で接続を作成しないし保持しない。
- * 　JCoランタイムがコネクションの生成を行い、設定によってはプーリングも行う。
- * と書いてある。
- * JCoランタイムとは実体のsapjco3.dllとかsapjco3.soの事。
+ * ※Environmentには１つしかプロバイダ登録できないので、登録と解除の実装場所は、実行環境に応じて検討する事。
+ * 　インスタンス毎に１つしかプロバイダは設定できないと思われる。
  * 
- *  * ※Environmentには１つしかプロバイダ登録できない。Enviromentのスコープを調査する必要あり。
- * 　サーバ・インスタンスで共通でした。つまりインスタンス毎に１つしかプロバイダは設定できない。
- * 　
+ * [チケット利用方法]
+ * １．SSODestinationDataProvider を生成する
+ * ２．Environment.registerDestinationDataProvider()で登録する
+ * ３．JCoDestinationManager.getDestination( destinationName )を呼ぶ(普通)
+ * 　destinationName は、:${host}:${systemNumber}:${clientNumber}:${uid}:${pwd} という文字列
+ * ４．得られたJCoDestinationからJCoCustomDestinationを作成する
+ * ５．JCoCustomDestinationからUserDataを取得し、チケットを設定する
+ * ６．JCoCustomDestinationでJCoFunctionを取得し、実行する。
+ * ７．Environment.unregisterDestinationDataProvider()で登録を解除する
+ * 
  * </pre>
  */
 public class SSODestinationDataProvider implements DestinationDataProvider
@@ -84,7 +88,6 @@ public class SSODestinationDataProvider implements DestinationDataProvider
 		String	mysapsso2= "";
 		
 		Properties	props= new Properties();
-		
 		try
 		{
 			String[]	token= destinationName.split( ":" );
@@ -148,7 +151,6 @@ public class SSODestinationDataProvider implements DestinationDataProvider
 			log.error( destinationName, e );
 		}
 		
-		
 		return props;
 	}
 	
@@ -177,16 +179,22 @@ public class SSODestinationDataProvider implements DestinationDataProvider
 	 */
 	public static void main( String[] args )
 	{
+		String destinationString= ":172.16.98.214:00:902:baseUid:basePwd";
 		String	uid= "";
 		String	pwd= "";
 		if( args.length > 0 )
 		{
-			uid= args[0];
+			destinationString= args[0];
 		}
-		if( args.length >1 )
+		if( args.length > 1 )
 		{
-			pwd= args[1];
+			uid= args[1];
 		}
+		if( args.length > 2 )
+		{
+			pwd= args[2];
+		}
+		
 		
 		
 		SSODestinationDataProvider	provider= new SSODestinationDataProvider();
@@ -198,25 +206,38 @@ public class SSODestinationDataProvider implements DestinationDataProvider
 			Environment.registerDestinationDataProvider( provider );
 			log.debug( "isDestinationDataProviderRegistered="+ Environment.isDestinationDataProviderRegistered() );
 			
-			JCoDestination	destination= JCoDestinationManager.getDestination( "getsso2:133.253.62.89:00:903:"+ uid +":"+ pwd );
+			//	SSO発行要求のdestinationを取得する
+			JCoDestination	destination= JCoDestinationManager.getDestination( "getsso2"+destinationString );
+			log.info( "destination.valid="+ destination.isValid() );
 			destination.getProperties().list( System.out );
-			log.info( destination.isValid() );
+			String ssoTicket1= destination.getAttributes().getSSOTicket();
+			log.debug( "ssoTicket1="+ ssoTicket1 );
 			
-			log.debug( "destination="+ destination.getDestinationID() +" "+ destination.getDestinationName() );
-			log.debug( "logonCheck="+ destination.getLogonCheck() );
-			String ssoTicket= destination.getAttributes().getSSOTicket();
-			log.debug( "ssoTicket="+ ssoTicket );
+			//	uid/pwdで指定されたユーザのSSOチケットを取得する。
+			JCoCustomDestination	custom= destination.createCustomDestination();
+			UserData	userData= custom.getUserLogonData();
+			userData.setUser( uid );
+			userData.setPassword( pwd );
+			String	ssoTicket2= custom.getAttributes().getSSOTicket();
+			log.debug( "ssoTicket2="+ ssoTicket2 );
 			
 			log.info( "----------" );
-			
-			JCoDestination	destination2= JCoDestinationManager.getDestination( "mysapsso2:133.253.62.89:00:903:"+ uid +":"+ssoTicket );
-			destination2.getProperties().list( System.out );
-			log.info( destination2.isValid() );
-			log.debug( "destination="+ destination2.getDestinationID() +" "+ destination2.getDestinationName() );
-			log.debug( "logonCheck="+ destination2.getLogonCheck() );
 
-			JCoFunction	function= destination2.getRepository().getFunction( "BAPI_USER_GET_DETAIL" );
-			System.out.println( function );
+			//	普通のdestinationを取得する
+			JCoDestination	destination2= JCoDestinationManager.getDestination( destinationString );
+			log.info( "destination.valid="+ destination2.isValid() );
+			destination2.getProperties().list( System.out );
+
+			//	SSOチケットをセットする
+			JCoCustomDestination	custom2= destination2.createCustomDestination();
+			UserData	userData2= custom2.getUserLogonData();
+			userData2.setSSOTicket( ssoTicket2 );
+			
+			//	ファンクションを取得し、実行する
+			JCoFunction	function= custom2.getRepository().getFunction( "BAPI_USER_GET_DETAIL" );
+			function.getImportParameterList().setValue( "USERNAME", "4501911013" );
+			function.execute( custom2 );
+			System.out.println( function.getExportParameterList().getValue( "ADDRESS" ) );
 
 		}
 		catch( Exception e )

@@ -42,6 +42,18 @@
 			<form-property name="dst" type="java.lang.String" />
 			<form-property name="num" type="int[]" />
 		</form-bean>
+		<form-bean name="LoginForm"
+				type="org.apache.struts.validator.DynaValidatorForm">
+			<form-property name="host" type="java.lang.String" />
+			<form-property name="systemNumber" type="java.lang.String" />
+			<form-property name="clientNumber" type="java.lang.String" />
+			<form-property name="uid" type="java.lang.String" />
+			<form-property name="pwd" type="java.lang.String" />
+		</form-bean>
+		<form-bean name="FunctionForm"
+				type="org.apache.struts.validator.DynaValidatorForm">
+			<form-property name="functionName" type="java.lang.String" />
+		</form-bean>
 
 <!-- sample form bean descriptor for a DynaActionForm
         <form-bean name="logonForm"
@@ -95,6 +107,23 @@
             name="test1Form"
             >
             <forward name="APL_OK" path="/check.jsp" />
+        </action>
+        <action path="/login"
+            type="jp.co.ksi.eip.commons.struts.InvokeAction"
+            parameter="jp.co.ksi.sap.incubator.bl.Login"
+            scope="request"
+            name="LoginForm"
+            >
+            <forward name="APL_OK" path="/viewFunction.jsp" />
+            <forward name="APL_ERR" path="/jcoLogin.jsp" />
+        </action>
+        <action path="/getFunction"
+            type="jp.co.ksi.eip.commons.struts.InvokeAction"
+            parameter="jp.co.ksi.sap.incubator.bl.GetFunction"
+            scope="request"
+            name="FunctionForm"
+            >
+            <forward name="APL_OK" path="/viewFunction.jsp" />
         </action>
 
     </action-mappings>

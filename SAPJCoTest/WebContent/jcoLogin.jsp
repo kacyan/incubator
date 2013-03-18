@@ -9,7 +9,6 @@
 <%@page import="com.sap.conn.jco.JCoListMetaData"%>
 <%@page import="java.io.PrintWriter"%>
 <%@page import="com.sap.conn.jco.JCoMetaData"%>
-<%@page import="jp.co.ksi.sap.incubator.TestKac"%>
 <%@page import="com.sap.conn.jco.JCoParameterList"%>
 <%@page import="com.sap.conn.jco.JCoFunction"%>
 <%@page import="com.sap.conn.jco.JCoDestinationManager"%>
@@ -32,7 +31,7 @@
 <bean:parameter name="pwd" id="pwd" value=""/>
 <bean:parameter name="host" id="host" value=""/>
 <bean:parameter name="submit" id="submit" value=""/>
-<form action=""jcoLogin.jsp method="post">
+<form action="login.do" method="post">
 <table>
  <tr>
   <th>サーバ</th>
@@ -52,10 +51,10 @@
  </tr>
  <tr>
   <th>パスワード</th>
-  <td><input type="text" name="pwd" value="<bean:write name="pwd"/>" size="20"></td>
+  <td><input type="password" name="pwd" value="<bean:write name="pwd"/>" size="20"></td>
  </tr>
 </table>
-<br/><input type="submit" name="submit" value="getImportParameterList">
+<br/><input type="submit" name="submit" value="Login">
 </form>
 <hr/>
 </body>

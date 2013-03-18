@@ -1,10 +1,10 @@
 jco.destination.peak_limit=10
 jco.client.ashost=133.253.62.89
-jco.client.client=903
-jco.client.lang=ja
-jco.client.passwd=password25
 jco.client.sysnr=00
-jco.client.user=4501911013
+jco.client.client=903
+jco.client.user=
+jco.client.passwd=
+jco.client.lang=ja
 #jco.client.type=external
 jco.client.trace=enable
 

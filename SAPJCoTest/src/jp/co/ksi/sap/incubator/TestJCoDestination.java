@@ -6,7 +6,6 @@ import jp.co.ksi.eip.commons.util.StringUtil;
 
 import org.apache.log4j.Logger;
 
-import com.sap.conn.jco.AbapException;
 import com.sap.conn.jco.JCoDestination;
 import com.sap.conn.jco.JCoDestinationManager;
 import com.sap.conn.jco.JCoField;
@@ -21,7 +20,7 @@ import com.sap.conn.jco.ext.Environment;
  * JCoDestinationの習作
  * @author kac
  * @since 2013/03/08
- * @version 2013/03/08
+ * @version 2013/03/15
  * <pre>
  * JCoDestinationのJavadocによると、
  * 　JCoDestinationは、JCoランタイムがコネクションを生成するのために必要な情報を持っているだけ。
@@ -49,17 +48,22 @@ public class TestJCoDestination
 	 */
 	public static void main(String[] args)
 	{
-		String functionName = "BAPI_SALESORDER_GETSTATUS";
-		functionName= "BAPI_EQUI_GETLIST";	//	importがないやつ
-		functionName= "RFC_READ_TABLE";
+		String destinationString= ":host:00:902:uid:pwd";
+		if( args.length > 0 )
+		{
+			destinationString= args[0];
+		}
+
+		String functionName = "RFC_READ_TABLE";
 		
-		UserDestinationDataProvider	provider= new UserDestinationDataProvider();
+		SSODestinationDataProvider	provider= new SSODestinationDataProvider();
+		provider.setLang( "ja" );
 		try
 		{
 			Environment.registerDestinationDataProvider( provider );
 						
 			//	${host}:${systemNumber}:${clientNumber}:${uid}:${pwd}
-			JCoDestination	destination= JCoDestinationManager.getDestination( "133.253.62.89:00:903:4501911013:password25" );
+			JCoDestination	destination= JCoDestinationManager.getDestination( destinationString );
 			
 			JCoFunction	function= destination.getRepository().getFunction( functionName );
 			System.out.println( function );
@@ -68,46 +72,40 @@ public class TestJCoDestination
 			if( importParameterList != null )
 			{
 				importParameterList.setValue(  "QUERY_TABLE", "TFTIT" );
-				importParameterList.setValue( "ROWCOUNT", 10 );
-				debugMetaData( importParameterList.getMetaData(), 0 );
-			}
-			
-			JCoParameterList	tableParameterList= function.getTableParameterList();
-			if( tableParameterList != null )
-			{
-				debugMetaData( tableParameterList.getMetaData(), 0 );
-			}
-			
-			JCoParameterList	changingParameterList= function.getChangingParameterList();
-			if( changingParameterList != null )
-			{
-				debugMetaData( changingParameterList.getMetaData(), 0 );
-			}
-
-			JCoParameterList	exportParameterList= function.getExportParameterList();
-			if( exportParameterList != null )
-			{
-				debugMetaData( exportParameterList.getMetaData(), 0 );
+				importParameterList.setValue( "ROWCOUNT", 50 );
+				importParameterList.setValue( "ROWSKIPS", 200 );
+				debugParameterList( importParameterList );
 			}
 			
 			function.execute( destination );
 			System.out.println( "----+----+----+----+----+----+----+----+----+----+----+----" );
 			
-			exportParameterList= function.getExportParameterList();
+			JCoParameterList	exportParameterList= function.getExportParameterList();
 			if( exportParameterList != null )
 			{
 				debugParameterList( exportParameterList );
 			}
+			JCoParameterList	changingParameterList= function.getChangingParameterList();
+			if( changingParameterList != null )
+			{
+				debugParameterList( changingParameterList );
+			}
 			
-			tableParameterList= function.getTableParameterList();
+			JCoParameterList	tableParameterList= function.getTableParameterList();
+			System.out.println( tableParameterList );
 			if( tableParameterList != null )
 			{
-				log.debug( tableParameterList.getValue( "DATA" ) );
 				JCoTable	table= (JCoTable)tableParameterList.getValue( "DATA" );
-				log.debug( table.getClassNameOfValue( "WA" ) );
-				log.debug( table.getString( "WA" ) );
-				log.debug( table.getValue( "WA" ) );
-				log.debug( table.getValue( "WA" ).getClass().getName() );
+				log.debug( "table.getFieldCount="+ table.getFieldCount() );
+				log.debug( "table.getNumColumns="+  table.getNumColumns() );
+				log.debug( "table.getNumRows="+  table.getNumRows() );	//	行数
+				log.debug( "table.getRow="+  table.getRow() );
+				log.debug( "DATA="+ table.toXML() );
+				for( int i= 0; i < table.getNumRows(); i++ )
+				{
+					table.setRow( i );
+					log.debug( "DATA.WA="+ table.getValue( "WA" ) );
+				}
 				System.out.println();
 				
 				debugParameterList( tableParameterList );
@@ -136,11 +134,11 @@ public class TestJCoDestination
 					JCoField	field= it.next();
 					if( field.isInitialized() )
 					{
-						log.debug( name +"."+ field.getName() +"="+ field.getValue() +" - "+ field.getClassNameOfValue() );
+						log.debug( md.getName() +": "+ name +"."+ field.getName() +"="+ field.getValue() +" - "+ field.getClassNameOfValue() );
 					}
 					else
 					{
-						log.debug( name +"."+ field.getName() +"="+ "" +" - "+ field.getClassNameOfValue() );
+						log.debug( md.getName() +": "+ name +"."+ field.getName() +"="+ "" +" - "+ field.getClassNameOfValue() );
 					}
 				}
 			}
@@ -150,12 +148,12 @@ public class TestJCoDestination
 				for( Iterator<JCoField> it= structure.iterator(); it.hasNext(); )
 				{
 					JCoField	field= it.next();
-					log.debug( name +"."+ field.getName() +"="+ field.getValue() +" - "+ field.getTypeAsString() );
+					log.debug( md.getName() +": "+ name +"."+ field.getName() +"="+ field.getValue() +" - "+ field.getTypeAsString() );
 				}
 			}
 			else
 			{
-				log.debug( name +"="+ value );
+				log.debug( md.getName() +": "+ name +"="+ value );
 			}
 		}
 		

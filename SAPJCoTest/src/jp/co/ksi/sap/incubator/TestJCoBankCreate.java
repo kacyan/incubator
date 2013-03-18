@@ -58,7 +58,7 @@ public class TestJCoBankCreate
 			JCoParameterList	importParams= function.getImportParameterList();
 			if( importParams != null )
 			{
-				TestKac.debugMetaData( importParams.getMetaData(), 0 );
+				TestJCoDestination.debugMetaData( importParams.getMetaData(), 0 );
 			}
 			importParams.setValue( "BANK_CTRY", "JP" );
 			importParams.setValue( "BANK_KEY", "0005004" );

@@ -10,7 +10,7 @@ import com.sap.conn.jco.JCoDestination;
 import com.sap.conn.jco.JCoDestinationManager;
 import com.sap.conn.jco.JCoException;
 import com.sap.conn.jco.JCoFunction;
-import com.sap.conn.jco.JCoParameterList;
+import com.sap.conn.jco.JCoStructure;
 import com.sap.conn.jco.JCoTable;
 import com.sap.conn.jco.ext.DestinationDataProvider;
 import com.sap.conn.jco.ext.Environment;
@@ -19,8 +19,10 @@ import com.sap.conn.jco.ext.Environment;
  * SSOTicketの習作
  * @author kac
  * @since 2013/01/08
- * @version 2013/03/13
+ * @version 2013/03/15
  * <pre>
+ * [2013/03/15]
+ * 
  * [2013/03/13]
  * SSOTicketを取得する。
  * 　destinationのプロパティjco.client.getsso に 1 をセットする為に、DestinationDataProviderを拡張する。
@@ -39,10 +41,23 @@ public class TestSSOTicket
 		
 		DestinationDataProvider	ddProvider= new SSODestinationDataProvider();
 		
-		String uid= "4501911013";
-		String pwd= "password25";
-		String	ssoTicket= "";
-		String	functionName= "BAPI_USER_GET_DETAIL";
+		String destinationString= "";
+		String uid= "";
+		String pwd= "";
+		if( args.length > 0 )
+		{
+			destinationString= args[0];
+		}
+		if( args.length > 1 )
+		{
+			uid= args[1];
+		}
+		if( args.length > 2 )
+		{
+			pwd= args[2];
+		}
+		String	ssoTicket1= "";
+		String	ssoTicket2= "";
 		
 		try
 		{
@@ -52,9 +67,10 @@ public class TestSSOTicket
 			}
 
 			//	GETSSO2を指定する
-//			JCoDestination	destination= JCoDestinationManager.getDestination( "GETSSO2:133.253.62.89:00:903:hoge:huga:" );
-			JCoDestination	destination= JCoDestinationManager.getDestination( "GETSSO2:172.16.98.214:00:902:hoge:huga:" );
+			JCoDestination	destination= JCoDestinationManager.getDestination( "GETSSO2"+ destinationString );
 			debugDestination( destination );
+			ssoTicket1= destination.getAttributes().getSSOTicket();
+			log.info( ssoTicket1 );
 			
 			//	CustomDstinationを使って、uid/pwdをセットする
 			JCoCustomDestination	custom= destination.createCustomDestination();
@@ -68,9 +84,13 @@ public class TestSSOTicket
 				JCoContext.begin( custom );
 				
 				//	ssoチケットを取得する
-				ssoTicket= custom.getAttributes().getSSOTicket();
+				ssoTicket2= custom.getAttributes().getSSOTicket();
 				
-				System.out.println( ssoTicket );
+				if( ssoTicket2 == null )
+				{
+					throw new Exception( "GETSSO2 failed. ssoTicket null." );
+				}
+				log.info( ssoTicket2 );
 			}
 			catch( Exception e )
 			{
@@ -82,14 +102,15 @@ public class TestSSOTicket
 			}
 
 			//	ssoチケットで認証してみる
-			destination= JCoDestinationManager.getDestination( ":133.253.62.89:00:903:"+ "4501981027B" +":"+ "makoto321" );
+			destination= JCoDestinationManager.getDestination( destinationString );
 			debugDestination( destination );
 			
 			//	CustomDstinationを使って、uid/ssoTicketをセットする
 			custom= destination.createCustomDestination();
 			userData= custom.getUserLogonData();
-			userData.setUser( "4501021010" );	//	別のユーザにしてみる
-			userData.setSSOTicket( ssoTicket );
+			userData.setUser( "4501021010" );	//	別のユーザにしてみる -> 結果はssoTicketのユーザが優先された。
+//			userData.setSSOTicket( ssoTicket1 );	//	ベースユーザのチケットを使う(更新権限なし)
+			userData.setSSOTicket( ssoTicket2 );
 			
 			custom.getProperties().list( System.out );
 			log.debug( userData );
@@ -97,87 +118,95 @@ public class TestSSOTicket
 			try
 			{
 				JCoContext.begin( custom );
+				log.debug( "---- start ----" );
+
+				custom.ping();
+				log.info( "ping ok!" );
 				
 				//	受注登録処理
 				JCoFunction	function= custom.getRepository().getFunction( "BAPI_SALESORDER_CREATEFROMDAT2" );
 				JCoFunction	commitfunc= custom.getRepository().getFunction( "BAPI_TRANSACTION_COMMIT" );
 				
-				function.getImportParameterList().getStructure("ORDER_HEADER_IN").setValue("DOC_TYPE","SO");
-				function.getImportParameterList().getStructure("ORDER_HEADER_IN").setValue("SALES_ORG","SALE");
-				function.getImportParameterList().getStructure("ORDER_HEADER_IN").setValue("DISTR_CHAN","01");
-				function.getImportParameterList().getStructure("ORDER_HEADER_IN").setValue("DIVISION","01");
-				function.getImportParameterList().getStructure("ORDER_HEADER_IN").setValue("PMNTTRMS","0001");
-				function.getImportParameterList().getStructure("ORDER_HEADER_IN").setValue("PURCH_NO_C","888888");
+				JCoStructure orderHeaderIn= function.getImportParameterList().getStructure("ORDER_HEADER_IN");
+				orderHeaderIn.setValue("DOC_TYPE","SO");
+				orderHeaderIn.setValue("SALES_ORG","SALE");
+				orderHeaderIn.setValue("DISTR_CHAN","01");
+				orderHeaderIn.setValue("DIVISION","01");
+				orderHeaderIn.setValue("PMNTTRMS","0001");
+				orderHeaderIn.setValue("PURCH_NO_C","888888");
 
-				function.getImportParameterList().getStructure("ORDER_HEADER_INX").setValue("UPDATEFLAG","I");
-				function.getImportParameterList().getStructure("ORDER_HEADER_INX").setValue("DOC_TYPE","X");
-				function.getImportParameterList().getStructure("ORDER_HEADER_INX").setValue("SALES_ORG","X");
-				function.getImportParameterList().getStructure("ORDER_HEADER_INX").setValue("DISTR_CHAN","X");
-				function.getImportParameterList().getStructure("ORDER_HEADER_INX").setValue("DIVISION","X");
-				function.getImportParameterList().getStructure("ORDER_HEADER_INX").setValue("PMNTTRMS","X");
-				function.getImportParameterList().getStructure("ORDER_HEADER_INX").setValue("PURCH_NO_C","X");
-
+				JCoStructure orderHeaderInx= function.getImportParameterList().getStructure("ORDER_HEADER_INX");
+				orderHeaderInx.setValue("UPDATEFLAG","I");
+				orderHeaderInx.setValue("DOC_TYPE","X");
+				orderHeaderInx.setValue("SALES_ORG","X");
+				orderHeaderInx.setValue("DISTR_CHAN","X");
+				orderHeaderInx.setValue("DIVISION","X");
+				orderHeaderInx.setValue("PMNTTRMS","X");
+				orderHeaderInx.setValue("PURCH_NO_C","X");
 
 				/*　得意先コードを入力 */
-				function.getTableParameterList().getTable("ORDER_PARTNERS").appendRow();
-				function.getTableParameterList().getTable("ORDER_PARTNERS").setValue("PARTN_ROLE","AG");
-				function.getTableParameterList().getTable("ORDER_PARTNERS").setValue("PARTN_NUMB","0000000039");
-
+				JCoTable orderPartners= function.getTableParameterList().getTable("ORDER_PARTNERS");
+				orderPartners.appendRow();
+				orderPartners.setValue("PARTN_ROLE","AG");
+				orderPartners.setValue("PARTN_NUMB","0000000039");
 
 				/* 明細の品番入力 */
-				function.getTableParameterList().getTable("ORDER_ITEMS_IN").appendRow();
-				function.getTableParameterList().getTable("ORDER_ITEMS_IN").setValue("ITM_NUMBER","000010");
-				function.getTableParameterList().getTable("ORDER_ITEMS_IN").setValue("MATERIAL","M01");
-				function.getTableParameterList().getTable("ORDER_ITEMS_IN").setValue("TARGET_QTY",1);
-				function.getTableParameterList().getTable("ORDER_ITEMS_IN").setValue("PLANT","PLNT");
-				function.getTableParameterList().getTable("ORDER_ITEMS_IN").setValue("SHIP_POINT","0001");
-				function.getTableParameterList().getTable("ORDER_ITEMS_IN").setValue("STORE_LOC","0001");
-				function.getTableParameterList().getTable("ORDER_ITEMS_IN").setValue("PO_DAT_S","20130331");
+				JCoTable orderItemsIn= function.getTableParameterList().getTable("ORDER_ITEMS_IN");
+				orderItemsIn.appendRow();
+				orderItemsIn.setValue("ITM_NUMBER","000010");
+				orderItemsIn.setValue("MATERIAL","M01");
+				orderItemsIn.setValue("TARGET_QTY",1);
+				orderItemsIn.setValue("PLANT","PLNT");
+				orderItemsIn.setValue("SHIP_POINT","0001");
+				orderItemsIn.setValue("STORE_LOC","0001");
+				orderItemsIn.setValue("PO_DAT_S","20130331");
 
-
-				function.getTableParameterList().getTable("ORDER_ITEMS_INX").appendRow();
-				function.getTableParameterList().getTable("ORDER_ITEMS_INX").setValue("UPDATEFLAG","I");
-				function.getTableParameterList().getTable("ORDER_ITEMS_INX").setValue("ITM_NUMBER","000010");
-				function.getTableParameterList().getTable("ORDER_ITEMS_INX").setValue("MATERIAL","X");
-				function.getTableParameterList().getTable("ORDER_ITEMS_INX").setValue("TARGET_QTY","X");
-				function.getTableParameterList().getTable("ORDER_ITEMS_INX").setValue("PLANT","X");
-				function.getTableParameterList().getTable("ORDER_ITEMS_INX").setValue("SHIP_POINT","X");
-				function.getTableParameterList().getTable("ORDER_ITEMS_INX").setValue("STORE_LOC","X");
-				function.getTableParameterList().getTable("ORDER_ITEMS_INX").setValue("PO_DAT_S","X");
-
+				JCoTable orderItemsInx= function.getTableParameterList().getTable("ORDER_ITEMS_INX");
+				orderItemsInx.appendRow();
+				orderItemsInx.setValue("UPDATEFLAG","I");
+				orderItemsInx.setValue("ITM_NUMBER","000010");
+				orderItemsInx.setValue("MATERIAL","X");
+				orderItemsInx.setValue("TARGET_QTY","X");
+				orderItemsInx.setValue("PLANT","X");
+				orderItemsInx.setValue("SHIP_POINT","X");
+				orderItemsInx.setValue("STORE_LOC","X");
+				orderItemsInx.setValue("PO_DAT_S","X");
 
 				/* スケジュール入力 */
-				function.getTableParameterList().getTable("ORDER_SCHEDULES_IN").appendRow();
-				function.getTableParameterList().getTable("ORDER_SCHEDULES_IN").setValue("ITM_NUMBER","000010");
-				function.getTableParameterList().getTable("ORDER_SCHEDULES_IN").setValue("SCHED_LINE","0001");
-				function.getTableParameterList().getTable("ORDER_SCHEDULES_IN").setValue("REQ_DATE","20130331");
-				function.getTableParameterList().getTable("ORDER_SCHEDULES_IN").setValue("REQ_QTY","1");
+				JCoTable orderSchedulesIn= function.getTableParameterList().getTable("ORDER_SCHEDULES_IN");
+				orderSchedulesIn.appendRow();
+				orderSchedulesIn.setValue("ITM_NUMBER","000010");
+				orderSchedulesIn.setValue("SCHED_LINE","0001");
+				orderSchedulesIn.setValue("REQ_DATE","20130331");
+				orderSchedulesIn.setValue("REQ_QTY","1");
 
-				function.getTableParameterList().getTable("ORDER_SCHEDULES_INX").appendRow();
-				function.getTableParameterList().getTable("ORDER_SCHEDULES_INX").setValue("UPDATEFLAG","I");
-				function.getTableParameterList().getTable("ORDER_SCHEDULES_INX").setValue("ITM_NUMBER","000010");
-				function.getTableParameterList().getTable("ORDER_SCHEDULES_INX").setValue("SCHED_LINE","0001");
-				function.getTableParameterList().getTable("ORDER_SCHEDULES_INX").setValue("REQ_DATE","X");
-				function.getTableParameterList().getTable("ORDER_SCHEDULES_INX").setValue("REQ_QTY","X");
-
+				JCoTable orderSchedulesInx= function.getTableParameterList().getTable("ORDER_SCHEDULES_INX");
+				orderSchedulesInx.appendRow();
+				orderSchedulesInx.setValue("UPDATEFLAG","I");
+				orderSchedulesInx.setValue("ITM_NUMBER","000010");
+				orderSchedulesInx.setValue("SCHED_LINE","0001");
+				orderSchedulesInx.setValue("REQ_DATE","X");
+				orderSchedulesInx.setValue("REQ_QTY","X");
 
 				/* 条件（金額設定）入力 */
-				function.getTableParameterList().getTable("ORDER_CONDITIONS_IN").appendRow();
-				function.getTableParameterList().getTable("ORDER_CONDITIONS_IN").setValue("ITM_NUMBER","000010");
+				JCoTable orderConditionsIn= function.getTableParameterList().getTable("ORDER_CONDITIONS_IN");
+				orderConditionsIn.appendRow();
+				orderConditionsIn.setValue("ITM_NUMBER","000010");
 //				function.getTableParameterList().getTable("ORDER_CONDITIONS_IN").setValue("SCHED_LINE",1);
-				function.getTableParameterList().getTable("ORDER_CONDITIONS_IN").setValue("COND_ST_NO","001");
-				function.getTableParameterList().getTable("ORDER_CONDITIONS_IN").setValue("COND_TYPE","PR00");			/*金額*/
-				function.getTableParameterList().getTable("ORDER_CONDITIONS_IN").setValue("COND_VALUE","500");			/*金額*/
-				function.getTableParameterList().getTable("ORDER_CONDITIONS_IN").setValue("COND_P_UNT","001");
+				orderConditionsIn.setValue("COND_ST_NO","001");
+				orderConditionsIn.setValue("COND_TYPE","PR00");			/*金額*/
+				orderConditionsIn.setValue("COND_VALUE","500");			/*金額*/
+				orderConditionsIn.setValue("COND_P_UNT","001");
 				
-				function.getTableParameterList().getTable("ORDER_CONDITIONS_INX").appendRow();
-				function.getTableParameterList().getTable("ORDER_CONDITIONS_INX").setValue("UPDATEFLAG","I");
-				function.getTableParameterList().getTable("ORDER_CONDITIONS_INX").setValue("ITM_NUMBER","000010");
+				JCoTable orderConditionsInx= function.getTableParameterList().getTable("ORDER_CONDITIONS_INX");
+				orderConditionsInx.appendRow();
+				orderConditionsInx.setValue("UPDATEFLAG","I");
+				orderConditionsInx.setValue("ITM_NUMBER","000010");
 //				function.getTableParameterList().getTable("ORDER_CONDITIONS_INX").setValue("SCHED_LINE","X");
-				function.getTableParameterList().getTable("ORDER_CONDITIONS_INX").setValue("COND_ST_NO","001");
-				function.getTableParameterList().getTable("ORDER_CONDITIONS_INX").setValue("COND_TYPE","X");			/*金額*/
-				function.getTableParameterList().getTable("ORDER_CONDITIONS_INX").setValue("COND_VALUE","X");
-				function.getTableParameterList().getTable("ORDER_CONDITIONS_INX").setValue("COND_P_UNT","X");
+				orderConditionsInx.setValue("COND_ST_NO","001");
+				orderConditionsInx.setValue("COND_TYPE","X");			/*金額*/
+				orderConditionsInx.setValue("COND_VALUE","X");
+				orderConditionsInx.setValue("COND_P_UNT","X");
 
 				//	実行
 				function.execute( custom );

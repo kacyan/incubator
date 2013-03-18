@@ -1,3 +1,7 @@
+[2013/03/18] Kac
+(1)JCoの接続設定を動的に行えるようにした。
+(2)destinationをsessionに保持するようにしてみた。
+
 [2013/02/21] Kac
 (1)サービスクラス(I/F)作成時にパッケージ名を指定できるよう改良してみた
 　WebContent/bapiDataClass.jsp
