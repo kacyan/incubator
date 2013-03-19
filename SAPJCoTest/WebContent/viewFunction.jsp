@@ -1,3 +1,4 @@
+<%@page import="jp.co.ksi.sap.incubator.bl.Login"%>
 <%@page import="com.sap.conn.jco.JCoField"%>
 <%@page import="java.util.Iterator"%>
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
@@ -267,6 +268,15 @@ for( Iterator<JCoField> i= exoprtList.iterator(); i.hasNext(); )
 %></table>
 </logic:notEmpty>
 <hr/>
+
+<%
+JCoDestination	destination= (JCoDestination)session.getAttribute( Login.SESS_ATTR_NAME_AUTH );
+if( destination != null )
+{
+%><textarea style="width:100%; height:20em;"><%=destination.getAttributes().getSSOTicket() %></textarea>
+<%
+}
+%>
 
 </body>
 </html>

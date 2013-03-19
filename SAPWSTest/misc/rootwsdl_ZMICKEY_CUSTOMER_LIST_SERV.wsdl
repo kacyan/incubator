@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:n1="urn:sap-com:document:sap:rfc:functions" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="urn:sap-com:document:sap:soap:functions:mc-style" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:sap-com:document:sap:soap:functions:mc-style">
+  <wsdl:documentation>
+    <sidl:sidl xmlns:sidl="http://www.sap.com/2007/03/sidl"/>
+  </wsdl:documentation>
+  <wsp:UsingPolicy wsdl:required="true"/>
+  <wsp:Policy wsu:Id="BN_ZMICKEY_CUSTOMER_LIST_BIND">
+    <saptrnbnd:OptimizedXMLTransfer xmlns:saptrnbnd="http://www.sap.com/webas/710/soap/features/transportbinding/" uri="http://xml.sap.com/2006/11/esi/esp/binxml" wsp:Optional="true"/>
+    <wsaw:UsingAddressing xmlns:wsaw="http://schemas.xmlsoap.org/ws/2004/08/addressing"/>
+    <sapattahnd:Enabled xmlns:sapattahnd="http://www.sap.com/710/features/attachment/">false</sapattahnd:Enabled>
+    <wsp:ExactlyOne xmlns:sapsp="http://www.sap.com/webas/630/soap/features/security/policy" xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:wsu="http://schemas.xmlsoap.org/ws/2002/07/utility">
+      <wsp:All>
+        <sp:TransportBinding>
+          <wsp:Policy>
+            <sp:TransportToken>
+              <wsp:Policy>
+                <sp:HttpsToken>
+                  <wsp:Policy>
+                    <sp:HttpBasicAuthentication/>
+                  </wsp:Policy>
+                </sp:HttpsToken>
+              </wsp:Policy>
+            </sp:TransportToken>
+            <sp:AlgorithmSuite>
+              <wsp:Policy>
+                <sp:TripleDesRsa15/>
+              </wsp:Policy>
+            </sp:AlgorithmSuite>
+            <sp:Layout>
+              <wsp:Policy>
+                <sp:Strict/>
+              </wsp:Policy>
+            </sp:Layout>
+          </wsp:Policy>
+        </sp:TransportBinding>
+      </wsp:All>
+      <wsp:All>
+        <sp:TransportBinding>
+          <wsp:Policy>
+            <sp:TransportToken>
+              <wsp:Policy>
+                <sp:HttpsToken>
+                  <wsp:Policy>
+                    <sapsp:HTTPSSO2/>
+                  </wsp:Policy>
+                </sp:HttpsToken>
+              </wsp:Policy>
+            </sp:TransportToken>
+            <sp:AlgorithmSuite>
+              <wsp:Policy>
+                <sp:TripleDesRsa15/>
+              </wsp:Policy>
+            </sp:AlgorithmSuite>
+            <sp:Layout>
+              <wsp:Policy>
+                <sp:Strict/>
+              </wsp:Policy>
+            </sp:Layout>
+          </wsp:Policy>
+        </sp:TransportBinding>
+      </wsp:All>
+    </wsp:ExactlyOne>
+  </wsp:Policy>
+  <wsp:Policy wsu:Id="IF_ZMICKEY_CUSTOMER_LIST">
+    <sapsession:Session xmlns:sapsession="http://www.sap.com/webas/630/soap/features/session/">
+      <sapsession:enableSession>false</sapsession:enableSession>
+    </sapsession:Session>
+    <sapcentraladmin:CentralAdministration xmlns:sapcentraladmin="http://www.sap.com/webas/700/soap/features/CentralAdministration/" wsp:Optional="true">
+      <sapcentraladmin:BusinessApplicationID>426C2F516CC4AA64E1000000AC1062D6</sapcentraladmin:BusinessApplicationID>
+    </sapcentraladmin:CentralAdministration>
+  </wsp:Policy>
+  <wsp:Policy wsu:Id="OP_CustomerGetlist">
+    <sapcomhnd:enableCommit xmlns:sapcomhnd="http://www.sap.com/NW05/soap/features/commit/">false</sapcomhnd:enableCommit>
+    <sapblock:enableBlocking xmlns:sapblock="http://www.sap.com/NW05/soap/features/blocking/">true</sapblock:enableBlocking>
+    <saptrhnw05:required xmlns:saptrhnw05="http://www.sap.com/NW05/soap/features/transaction/">no</saptrhnw05:required>
+    <saprmnw05:enableWSRM xmlns:saprmnw05="http://www.sap.com/NW05/soap/features/wsrm/">false</saprmnw05:enableWSRM>
+  </wsp:Policy>
+  <wsdl:types>
+    <xsd:schema attributeFormDefault="qualified" targetNamespace="urn:sap-com:document:sap:rfc:functions">
+      <xsd:simpleType name="char1">
+        <xsd:restriction base="xsd:string">
+          <xsd:maxLength value="1"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="char10">
+        <xsd:restriction base="xsd:string">
+          <xsd:maxLength value="10"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="char2">
+        <xsd:restriction base="xsd:string">
+          <xsd:maxLength value="2"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="char20">
+        <xsd:restriction base="xsd:string">
+          <xsd:maxLength value="20"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="char220">
+        <xsd:restriction base="xsd:string">
+          <xsd:maxLength value="220"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="char3">
+        <xsd:restriction base="xsd:string">
+          <xsd:maxLength value="3"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="char30">
+        <xsd:restriction base="xsd:string">
+          <xsd:maxLength value="30"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="char40">
+        <xsd:restriction base="xsd:string">
+          <xsd:maxLength value="40"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="char50">
+        <xsd:restriction base="xsd:string">
+          <xsd:maxLength value="50"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="char60">
+        <xsd:restriction base="xsd:string">
+          <xsd:maxLength value="60"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="numeric3">
+        <xsd:restriction base="xsd:string">
+          <xsd:maxLength value="3"/>
+          <xsd:pattern value="\d*"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="numeric6">
+        <xsd:restriction base="xsd:string">
+          <xsd:maxLength value="6"/>
+          <xsd:pattern value="\d*"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:schema>
+    <xsd:schema xmlns:n0="urn:sap-com:document:sap:rfc:functions" attributeFormDefault="qualified" targetNamespace="urn:sap-com:document:sap:soap:functions:mc-style">
+      <xsd:import namespace="urn:sap-com:document:sap:rfc:functions"/>
+      <xsd:complexType name="BapicustomerIdrange">
+        <xsd:sequence>
+          <xsd:element name="Sign" type="n0:char1"/>
+          <xsd:element name="Option" type="n0:char2"/>
+          <xsd:element name="Low" type="n0:char10"/>
+          <xsd:element name="High" type="n0:char10"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="BapicustomerSpecialdata">
+        <xsd:sequence>
+          <xsd:element name="Customer" type="n0:char10"/>
+          <xsd:element name="Acc1Time" type="n0:char1"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="BapicustomerAddressdata">
+        <xsd:sequence>
+          <xsd:element name="Customer" type="n0:char10"/>
+          <xsd:element name="Sort1" type="n0:char20"/>
+          <xsd:element name="Name" type="n0:char40"/>
+          <xsd:element name="Country" type="n0:char3"/>
+          <xsd:element name="Countryiso" type="n0:char2"/>
+          <xsd:element name="City" type="n0:char40"/>
+          <xsd:element name="PostlCod1" type="n0:char10"/>
+          <xsd:element name="Region" type="n0:char3"/>
+          <xsd:element name="Street" type="n0:char60"/>
+          <xsd:element name="Tel1Numbr" type="n0:char30"/>
+          <xsd:element name="FaxNumber" type="n0:char30"/>
+          <xsd:element name="Address" type="n0:char10"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="Bapireturn1">
+        <xsd:sequence>
+          <xsd:element name="Type" type="n0:char1"/>
+          <xsd:element name="Id" type="n0:char20"/>
+          <xsd:element name="Number" type="n0:numeric3"/>
+          <xsd:element name="Message" type="n0:char220"/>
+          <xsd:element name="LogNo" type="n0:char20"/>
+          <xsd:element name="LogMsgNo" type="n0:numeric6"/>
+          <xsd:element name="MessageV1" type="n0:char50"/>
+          <xsd:element name="MessageV2" type="n0:char50"/>
+          <xsd:element name="MessageV3" type="n0:char50"/>
+          <xsd:element name="MessageV4" type="n0:char50"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="TableOfBapicustomerIdrange">
+        <xsd:sequence>
+          <xsd:element maxOccurs="unbounded" minOccurs="0" name="item" type="tns:BapicustomerIdrange"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="TableOfBapicustomerSpecialdata">
+        <xsd:sequence>
+          <xsd:element maxOccurs="unbounded" minOccurs="0" name="item" type="tns:BapicustomerSpecialdata"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="TableOfBapicustomerAddressdata">
+        <xsd:sequence>
+          <xsd:element maxOccurs="unbounded" minOccurs="0" name="item" type="tns:BapicustomerAddressdata"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="CustomerGetlist">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="0" name="Addressdata" type="tns:TableOfBapicustomerAddressdata"/>
+            <xsd:element minOccurs="0" name="Cpdonly" type="n0:char1"/>
+            <xsd:element name="Idrange" type="tns:TableOfBapicustomerIdrange"/>
+            <xsd:element minOccurs="0" name="Maxrows" type="xsd:int"/>
+            <xsd:element minOccurs="0" name="Specialdata" type="tns:TableOfBapicustomerSpecialdata"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="CustomerGetlistResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="Addressdata" type="tns:TableOfBapicustomerAddressdata"/>
+            <xsd:element name="Idrange" type="tns:TableOfBapicustomerIdrange"/>
+            <xsd:element name="Return" type="tns:Bapireturn1"/>
+            <xsd:element name="Specialdata" type="tns:TableOfBapicustomerSpecialdata"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="CustomerGetlist">
+    <wsdl:part element="tns:CustomerGetlist" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="CustomerGetlistResponse">
+    <wsdl:part element="tns:CustomerGetlistResponse" name="parameter"/>
+  </wsdl:message>
+  <wsdl:portType name="ZMICKEY_CUSTOMER_LIST">
+    <wsp:Policy>
+      <wsp:PolicyReference URI="#IF_ZMICKEY_CUSTOMER_LIST"/>
+    </wsp:Policy>
+    <wsdl:operation name="CustomerGetlist">
+      <wsp:Policy>
+        <wsp:PolicyReference URI="#OP_CustomerGetlist"/>
+      </wsp:Policy>
+      <wsdl:input message="tns:CustomerGetlist"/>
+      <wsdl:output message="tns:CustomerGetlistResponse"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="ZMICKEY_CUSTOMER_LIST_BIND" type="tns:ZMICKEY_CUSTOMER_LIST">
+    <wsp:Policy>
+      <wsp:PolicyReference URI="#BN_ZMICKEY_CUSTOMER_LIST_BIND"/>
+    </wsp:Policy>
+    <wsa:EndpointReference xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing">
+      <wsa:ReferenceParameters/>
+    </wsa:EndpointReference>
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="CustomerGetlist">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="ZMICKEY_CUSTOMER_LIST_SERV">
+    <wsdl:port binding="tns:ZMICKEY_CUSTOMER_LIST_BIND" name="ZMICKEY_CUSTOMER_LIST_BIND">
+      <soap:address location="http://recc5.dev.ksi.co.jp:8000/sap/bc/srt/rfc/sap/zmickey_customer_list/902/zmickey_customer_list_serv/zmickey_customer_list_bind"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -53,6 +53,10 @@
   <th>パスワード</th>
   <td><input type="password" name="pwd" value="<bean:write name="pwd"/>" size="20"></td>
  </tr>
+ <tr>
+  <th>SSOチケット</th>
+  <td><input type="checkbox" name="type" value="getsso2">GETSSO2</td>
+ </tr>
 </table>
 <br/><input type="submit" name="submit" value="Login">
 </form>

@@ -62,22 +62,24 @@ public class Login implements IStruts
 		String	clientNumber= dyna.getString( "clientNumber" );
 		String	uid= dyna.getString( "uid" );
 		String	pwd= dyna.getString( "pwd" );
+		String	type= dyna.getString( "type" );
+		log.debug( "type="+ type );
 		
 		try
 		{
 			//	SSOチケットを取得する
-			JCoDestination	destination= JCoDestinationManager.getDestination( ":"+ host+ ":"+ systemNumber +":"+ clientNumber +":"+ uid +":"+ pwd  );
+			JCoDestination	destination= JCoDestinationManager.getDestination( type+ ":"+ host+ ":"+ systemNumber +":"+ clientNumber +":"+ uid +":"+ pwd  );
 			destination.ping();
 			//	destinationをセッションに保存する
 			HttpSession	session= request.getSession();
 			session.setAttribute( SESS_ATTR_NAME_AUTH, destination );
 
-			log.info( "destinaion ok. "+ destination );
+			log.info( "destinaion ok. "+ type +":"+ host+ ":"+ systemNumber +":"+ clientNumber +":"+ uid );
 			return APL_OK;
 		}
 		catch( Exception e )
 		{//	認証失敗
-			log.warn( "destinaion failed. "+":"+ host+ ":"+ systemNumber +":"+ clientNumber +":"+ uid +":"+ pwd, e );
+			log.warn( "destinaion failed. "+ type +":"+ host+ ":"+ systemNumber +":"+ clientNumber +":"+ uid, e );
 			return APL_ERR;
 		}
 

@@ -210,35 +210,9 @@ public class SSODestinationDataProvider implements DestinationDataProvider
 			JCoDestination	destination= JCoDestinationManager.getDestination( "getsso2"+destinationString );
 			log.info( "destination.valid="+ destination.isValid() );
 			destination.getProperties().list( System.out );
-			String ssoTicket1= destination.getAttributes().getSSOTicket();
-			log.debug( "ssoTicket1="+ ssoTicket1 );
-			
-			//	uid/pwdで指定されたユーザのSSOチケットを取得する。
-			JCoCustomDestination	custom= destination.createCustomDestination();
-			UserData	userData= custom.getUserLogonData();
-			userData.setUser( uid );
-			userData.setPassword( pwd );
-			String	ssoTicket2= custom.getAttributes().getSSOTicket();
-			log.debug( "ssoTicket2="+ ssoTicket2 );
-			
-			log.info( "----------" );
-
-			//	普通のdestinationを取得する
-			JCoDestination	destination2= JCoDestinationManager.getDestination( destinationString );
-			log.info( "destination.valid="+ destination2.isValid() );
-			destination2.getProperties().list( System.out );
-
-			//	SSOチケットをセットする
-			JCoCustomDestination	custom2= destination2.createCustomDestination();
-			UserData	userData2= custom2.getUserLogonData();
-			userData2.setSSOTicket( ssoTicket2 );
-			
-			//	ファンクションを取得し、実行する
-			JCoFunction	function= custom2.getRepository().getFunction( "BAPI_USER_GET_DETAIL" );
-			function.getImportParameterList().setValue( "USERNAME", "4501911013" );
-			function.execute( custom2 );
-			System.out.println( function.getExportParameterList().getValue( "ADDRESS" ) );
-
+			String ssoTicket= destination.getAttributes().getSSOTicket();
+			log.info( "ssoTicket ---------+---------+---------+---------+---------+\n"+ ssoTicket );
+			log.info( "ssoTicket ---------+---------+---------+---------+---------+" );
 		}
 		catch( Exception e )
 		{

@@ -117,8 +117,8 @@ public class CustomDestinationDataProvider
         connectProperties.setProperty(DestinationDataProvider.JCO_ASHOST, "172.16.98.214");
         connectProperties.setProperty(DestinationDataProvider.JCO_SYSNR,  "00");
         connectProperties.setProperty(DestinationDataProvider.JCO_CLIENT, "902");
-        connectProperties.setProperty(DestinationDataProvider.JCO_USER,   "4501911013");
-        connectProperties.setProperty(DestinationDataProvider.JCO_PASSWD, "password25");
+        connectProperties.setProperty(DestinationDataProvider.JCO_USER,   "");
+        connectProperties.setProperty(DestinationDataProvider.JCO_PASSWD, "");
         connectProperties.setProperty(DestinationDataProvider.JCO_LANG,   "ja");
         connectProperties.setProperty(DestinationDataProvider.JCO_TRACE, "enable");
         connectProperties.setProperty(DestinationDataProvider.JCO_AUTH_TYPE,"");

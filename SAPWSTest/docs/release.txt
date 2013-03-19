@@ -1,0 +1,8 @@
+[2013/03/19] Kac
+１．SOAP化したBAPIを呼び出す習作
+　jp.co.ksi.sap.test.TestUserGetDetailBasic
+　jp.co.ksi.sap.test.TestUserGetDetailTicket1
+　jp.co.ksi.sap.test.TestUserGetDetailTicket2
+　misc/UserGetDetailBasic
+　misc/UserGetDetailTicket1
+　misc/UserGetDetailTicket2
