@@ -1,58 +1,60 @@
 package jp.co.ksi.sap.incubator.bl;
 
-import java.util.Properties;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 
-import com.sap.conn.jco.JCoCustomDestination;
-import com.sap.conn.jco.JCoDestination;
-import com.sap.conn.jco.JCoDestinationManager;
 import com.sap.conn.jco.JCoFunction;
 import com.sap.conn.jco.JCoParameterList;
 
-import jp.co.ksi.eip.commons.struts.IStruts;
 import jp.co.ksi.eip.commons.struts.InvokeAction;
-import jp.co.ksi.sap.incubator.Auth;
 
 /**
  * Functionを取得します
+ * <pre>
+ * [in]
+ * 	functionName	String
+ * [out]
+ * 	importList	JCoParameterList
+ * 	tableList	JCoParameterList
+ * 	changingList	JCoParameterList
+ * 	exportList	JCoParameterList
+ * </pre>
  * @author kac
  * @since 2013/03/18
- * @version 2013/03/18
+ * @version 2013/03/28
+ * <pre>
+ * 動作確認
+ * BAPI_USER_GET_DETAIL	○
+ * BAPI_USER_GETLIST	△
+ * 
+ * </pre>
  */
-public class GetFunction implements IStruts
+public class GetFunction extends BaseBL
 {
-	private static Logger	log= Logger.getLogger( GetFunction.class );
+	private static Logger log= Logger.getLogger( GetFunction.class );
 
-	@Override
-	public String execute( InvokeAction action, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response )
-			throws Exception
+	protected String execBL( InvokeAction action, ActionForm form,
+			HttpServletRequest request )
 	{
-		ServletContext	context= action.getServlet().getServletContext();
-		Properties	appConfig= (Properties)context.getAttribute( "appConfig" );
-
-		HttpSession	session= request.getSession();
-		JCoDestination	destination= (JCoDestination)session.getAttribute( Login.SESS_ATTR_NAME_AUTH );
-		if( destination == null )
-		{
-			return APL_ERR;
-		}
-		
 		//	パラメータを取得する
 		DynaActionForm	dyna= (DynaActionForm)form;
 		String	functionName= dyna.getString( "functionName" );
 		
 		try
 		{
-			JCoFunction	function= destination.getRepository().getFunction( functionName );
+			JCoFunction	function= auth.getDestination().getRepository().getFunction( functionName );
+			if( function == null )
+			{
+				log.info( functionName +" not found." );
+				errors.add( ActionMessages.GLOBAL_MESSAGE, new ActionMessage( "BL.GetFunction.ERR.001", functionName ) );
+				return APL_OK;
+			}
 			JCoParameterList	importList= function.getImportParameterList();
 			JCoParameterList	tableList= function.getTableParameterList();
 			JCoParameterList	changingList= function.getChangingParameterList();
@@ -68,7 +70,12 @@ public class GetFunction implements IStruts
 		catch( Exception e )
 		{//	エラー
 			log.warn( "functionName="+ functionName, e );
+			errors.add( ActionMessages.GLOBAL_MESSAGE, new ActionMessage( "BL.ERR.DEFAULT", getClass().getName(), e.toString() ) );
 			return APL_ERR;
+		}
+		finally
+		{
+			
 		}
 	}
 }

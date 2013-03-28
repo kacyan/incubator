@@ -10,6 +10,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
@@ -56,6 +57,12 @@ public class RequestDebugFilter implements Filter
 		}
 
 		chain.doFilter( req, res );
+		
+		if( res instanceof HttpServletResponse )
+		{
+			HttpServletResponse response= (HttpServletResponse)res;
+			log.info( response.getBufferSize() +" "+ response.getCharacterEncoding() +" "+ response.getContentType() +" "+ response.getLocale() );
+		}
 	}
 
 	public void init( FilterConfig config ) throws ServletException

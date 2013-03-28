@@ -1,3 +1,24 @@
+[2013/03/28] Kac
+(1)BAPIの実行もできるようにした。
+(2)構造体パラメータも指定できるようにした。
+　jp.co.ksi.asp.incubator.bl.ExecFunction
+　WebContent/viewFunction.jsp
+(3)認証情報を管理するようにした。
+　jp.co.ksi.eip.commons.servlet.Auth
+　jp.co.ksi.eip.commons.servlet.CheckAuthFilter
+　jp.co.ksi.eip.commons.servlet.GeneticAuth
+　jp.co.ksi.sap.incubator.DestinationAuth
+　jp.co.ksi.asp.incubator.bl.BaseBL
+　jp.co.ksi.asp.incubator.bl.GetFunction
+　jp.co.ksi.asp.incubator.bl.Login
+　WebContent/jcoLogin.jsp
+　WebContent/WEB-INF/web.xml
+　webapps/ardbeg/WEB-INF/web.xml
+
+[2013/03/26] Kac
+(1)ビルドファイルを修正した。MANIFEST.MFを指定し忘れてた。
+　build.xml
+
 [2013/03/18] Kac
 (1)JCoの接続設定を動的に行えるようにした。
 (2)destinationをsessionに保持するようにしてみた。

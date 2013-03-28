@@ -17,6 +17,10 @@
 <%@ taglib uri="struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="struts-html.tld" prefix="html" %>
 <%@ taglib uri="struts-logic.tld" prefix="logic" %>
+<%--
+jcoLogin.jsp
+2013/03/27
+ --%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <jsp:useBean id="appConfig" beanName="appConfig" type="java.util.Properties" scope="application"/>
 <html>
@@ -31,7 +35,14 @@
 <bean:parameter name="pwd" id="pwd" value=""/>
 <bean:parameter name="host" id="host" value=""/>
 <bean:parameter name="submit" id="submit" value=""/>
-<form action="login.do" method="post">
+<logic:present name="javax.servlet.forward.request_uri" scope="request">
+ <bean:define id="requestURI" name="javax.servlet.forward.request_uri"/>
+</logic:present>
+<logic:notPresent name="javax.servlet.forward.request_uri" scope="request">
+ <bean:define id="requestURI" value=""/>
+</logic:notPresent>
+<html:form action="/login" method="post" >
+<input type="hidden" name="requestURI" value="<bean:write name="requestURI"/>"><bean:write name="requestURI"/>
 <table>
  <tr>
   <th>サーバ</th>
@@ -59,7 +70,7 @@
  </tr>
 </table>
 <br/><input type="submit" name="submit" value="Login">
-</form>
+</html:form>
 <hr/>
 </body>
 </html>

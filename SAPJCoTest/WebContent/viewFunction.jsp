@@ -1,3 +1,4 @@
+<%@page import="jp.co.ksi.sap.incubator.DestinationAuth"%>
 <%@page import="jp.co.ksi.sap.incubator.bl.Login"%>
 <%@page import="com.sap.conn.jco.JCoField"%>
 <%@page import="java.util.Iterator"%>
@@ -18,6 +19,10 @@
 <%@ taglib uri="struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="struts-html.tld" prefix="html" %>
 <%@ taglib uri="struts-logic.tld" prefix="logic" %>
+<%--
+viewFunction.jsp
+2013/03/28
+ --%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <jsp:useBean id="appConfig" beanName="appConfig" type="java.util.Properties" scope="application"/>
 <html>
@@ -37,103 +42,202 @@
 <input type="submit" name="submit" value="getParameterList">
 </form>
 <hr/>
+<jsp:include page="inc/error.jsp" flush="true"/>
 
+<!-- importList -->
+<html:form action="/execFunction" method="post">
+<input type="hidden" name="functionName" value="<bean:write name="functionName"/>">
 <logic:notEmpty name="importList" scope="request">
+<jsp:useBean id="importList" scope="request" type="com.sap.conn.jco.JCoParameterList"/>
+<%
+JCoListMetaData md= importList.getListMetaData();
+%><p><%=md.getName() %>(<%=md.getFieldCount() %>)</p>
 <table border="1">
  <tr>
   <th>Name</th>
-  <th>Name</th>
+  <th>Description</th>
   <th>ClassName</th>
+  <th>AbapObject</th>
+  <th>Changing</th>
+  <th>Exception</th>
+  <th>Export</th>
+  <th>Import</th>
+  <th>NestedType1Structure</th>
+  <th>Optional</th>
   <th>Value</th>
  </tr>
 <%
-JCoParameterList	importList= (JCoParameterList)request.getAttribute( "importList" );
-for( Iterator<JCoField> i= importList.iterator(); i.hasNext(); )
+for( int i= 0; i < md.getFieldCount(); i++ )
 {
-	JCoField	field= i.next();
-	if( field.isTable() )
+%> <tr>
+  <td><%=md.getName( i ) %></td>
+  <td><%=md.getDescription( i ) %></td>
+  <td><%=md.getClassNameOfField( i ) %></td>
+  <td><%=md.isAbapObject( i )?"○":"" %></td>
+  <td><%=md.isChanging( i )?"○":"" %></td>
+  <td><%=md.isException( i )?"○":"" %></td>
+  <td><%=md.isExport( i )?"○":"" %></td>
+  <td><%=md.isImport( i )?"○":"" %></td>
+  <td><%=md.isNestedType1Structure( i ) ?"○":"" %></td>
+  <td><%=md.isOptional( i )?"○":"" %></td>
+  <td>
+<%
+	if( md.isTable( i ) )
 	{//	JCoTable
-		JCoTable	table= field.getTable();
-			for( Iterator<JCoField>	i2= table.iterator(); i2.hasNext(); )
-			{
-				JCoField	field2= i2.next();
-%> <tr>
-  <td><%=field.getName() %></td>
-  <td><%=field2.getName() %></td>
-  <td><%=field2.getClassNameOfValue() %></td>
-  <td><%=field2.isInitialized() ? field2.getValue() : "" %></td>
- </tr>
+		JCoTable	table= importList.getTable( i );
+%>  <%=table %>
 <%
-			}
 	}
-	else if( field.isStructure() )
+	else if( md.isStructure( i ) )
 	{//	JCoStructure
-		JCoStructure	strusture= field.getStructure();
-			for( Iterator<JCoField>	i2= strusture.iterator(); i2.hasNext(); )
-			{
-				JCoField	field2= i2.next();
-%> <tr>
-  <td><%=field.getName() %></td>
-  <td><%=field2.getName() %></td>
-  <td><%=field2.getClassNameOfValue() %></td>
-  <td><%=field2.isInitialized() ? field2.getValue() : "" %></td>
- </tr>
+		JCoStructure	strusture= importList.getStructure( i );
+%>   <table border="1">
 <%
+		for( Iterator<JCoField> it= strusture.iterator(); it.hasNext(); )
+		{
+			JCoField	field= it.next();
+			String	value= "";
+			if( field.isInitialized() )
+			{
+				Object	obj= field.getValue();
+				if( obj != null )
+				{
+					value= obj.toString();
+				}
 			}
+%>    <tr>
+     <td><%=field.getName() %></td>
+     <td><%=field.getDescription() %></td>
+     <td><%=field.getClassNameOfValue() %></td>
+     <td><input type="text" name="<%=md.getName( i ) %>.<%=field.getName() %>" value="<%=value %>"></td>
+    </tr>
+<%
+		}
+%>   </table>
+<%
 	}
 	else
 	{
-%> <tr>
-  <td><%=field.getName() %></td>
-  <td></td>
-  <td><%=field.getClassNameOfValue() %></td>
-  <td><%=field.isInitialized() ? field.getValue() : "" %></td>
- </tr>
+%>   <input type="text" name="<%=md.getName( i ) %>" value="<%=importList.isInitialized( i ) ? importList.getValue( i ) : "" %>">
 <%
 	}
-}%></table>
+%>  </td>
+ </tr>
+<%
+}
+%></table>
 </logic:notEmpty>
+<html:checkbox property="flgCommit" >コミット処理を行う</html:checkbox><br/>
+<input type="submit" name="submit.execFunction" value="実行">
+</html:form>
 <hr/>
 
+<!-- tableList -->
 <logic:notEmpty name="tableList" scope="request">
+<jsp:useBean id="tableList" scope="request" type="com.sap.conn.jco.JCoParameterList"/>
+<%
+JCoListMetaData md= tableList.getListMetaData();
+%><p><%=md.getName() %>(<%=md.getFieldCount() %>)</p>
 <table border="1">
  <tr>
   <th>Name</th>
-  <th>Name</th>
+  <th>Description</th>
   <th>ClassName</th>
+  <th>AbapObject</th>
+  <th>Changing</th>
+  <th>Exception</th>
+  <th>Export</th>
+  <th>Import</th>
+  <th>NestedType1Structure</th>
+  <th>Optional</th>
   <th>Value</th>
  </tr>
 <%
-JCoParameterList	tableList= (JCoParameterList)request.getAttribute( "tableList" );
-for( Iterator<JCoField> i= tableList.iterator(); i.hasNext(); )
+for( int i= 0; i < md.getFieldCount(); i++ )
 {
-	JCoField	field= i.next();
-	if( field.isTable() )
+	if( md.isTable( i ) )
 	{//	JCoTable
-		JCoTable	table= field.getTable();
-			for( Iterator<JCoField>	i2= table.iterator(); i2.hasNext(); )
-			{
-				JCoField	field2= i2.next();
+		JCoTable	table= tableList.getTable( i );
+		JCoMetaData	tableMd= table.getMetaData();
 %> <tr>
-  <td><%=field.getName() %></td>
-  <td><%=field2.getName() %></td>
-  <td><%=field2.getClassNameOfValue() %></td>
-  <td><%=field2.isInitialized() ? field2.getValue() : "" %></td>
- </tr>
+  <td><%=md.getName( i ) %></td>
+  <td><%=md.getDescription( i ) %></td>
+  <td><%=md.getClassNameOfField( i ) %><br/>
+   <%=table.getFieldCount() %>, <%=table.getNumColumns() %>, <%=table.getNumRows() %>
+  </td>
+  <td><%=md.isAbapObject( i )?"○":"" %></td>
+  <td><%=md.isChanging( i )?"○":"" %></td>
+  <td><%=md.isException( i )?"○":"" %></td>
+  <td><%=md.isExport( i )?"○":"" %></td>
+  <td><%=md.isImport( i )?"○":"" %></td>
+  <td><%=md.isNestedType1Structure( i ) ?"○":"" %></td>
+  <td><%=md.isOptional( i )?"○":"" %></td>
+  <td colspan="2">
+   <table border="1">
+    <tr>
+<%
+		for( int j= 0; j < tableMd.getFieldCount(); j++ )
+		{
+%>     <th><%=tableMd.getName( j ) %></th>
+<%			
+		}
+%>    </tr>
+    <tr>
+<%
+		for( int j= 0; j < tableMd.getFieldCount(); j++ )
+		{
+%>     <th><%=tableMd.getDescription( j ) %></th>
+<%			
+		}
+%>    </tr>
+    <tr>
+<%
+		for( int j= 0; j < tableMd.getFieldCount(); j++ )
+		{
+%>     <th><%=tableMd.getClassNameOfField( j ) %></th>
+<%			
+		}
+%>    </tr>
+<%
+		do
+		{
+%>    <tr>
+<%
+			for( Iterator<JCoField>	it= table.iterator(); it.hasNext(); )
+			{
+				JCoField	field= it.next();
+%>     <td><%=field.isInitialized() ? field.getValue() : "" %></td>
 <%
 			}
+%>    </tr>
+<%
+		}while( table.nextRow() );
+%>
+   </table>
+  </td>
+ </tr>
+<%
 	}
-	else if( field.isStructure() )
+	else if( md.isStructure( i ) )
 	{//	JCoStructure
-		JCoStructure	strusture= field.getStructure();
-			for( Iterator<JCoField>	i2= strusture.iterator(); i2.hasNext(); )
-			{
-				JCoField	field2= i2.next();
+		JCoStructure	strusture= tableList.getStructure( i );
+		for( Iterator<JCoField>	i2= strusture.iterator(); i2.hasNext(); )
+		{
+			JCoField	field= i2.next();
 %> <tr>
+  <td><%=md.getName( i ) %></td>
+  <td><%=md.getDescription( i ) %></td>
+  <td><%=md.isAbapObject( i )?"○":"" %></td>
+  <td><%=md.isChanging( i )?"○":"" %></td>
+  <td><%=md.isException( i )?"○":"" %></td>
+  <td><%=md.isExport( i )?"○":"" %></td>
+  <td><%=md.isImport( i )?"○":"" %></td>
+  <td><%=md.isNestedType1Structure( i ) ?"○":"" %></td>
+  <td><%=md.isOptional( i )?"○":"" %></td>
   <td><%=field.getName() %></td>
-  <td><%=field2.getName() %></td>
-  <td><%=field2.getClassNameOfValue() %></td>
-  <td><%=field2.isInitialized() ? field2.getValue() : "" %></td>
+  <td><%=field.getDescription() %></td>
+  <td><%=field.getClassNameOfValue() %></td>
+  <td><%=field.isInitialized() ? field.getValue() : "" %></td>
  </tr>
 <%
 			}
@@ -141,10 +245,17 @@ for( Iterator<JCoField> i= tableList.iterator(); i.hasNext(); )
 	else
 	{
 %> <tr>
-  <td><%=field.getName() %></td>
-  <td></td>
-  <td><%=field.getClassNameOfValue() %></td>
-  <td><%=field.isInitialized() ? field.getValue() : "" %></td>
+  <td><%=md.getName( i ) %></td>
+  <td><%=md.getDescription( i ) %></td>
+  <td><%=md.getClassNameOfField( i ) %></td>
+  <td><%=md.isAbapObject( i )?"○":"" %></td>
+  <td><%=md.isChanging( i )?"○":"" %></td>
+  <td><%=md.isException( i )?"○":"" %></td>
+  <td><%=md.isExport( i )?"○":"" %></td>
+  <td><%=md.isImport( i )?"○":"" %></td>
+  <td><%=md.isNestedType1Structure( i ) ?"○":"" %></td>
+  <td><%=md.isOptional( i )?"○":"" %></td>
+  <td><input type="text" name="<%=md.getName( i ) %>" value="<%=tableList.isInitialized( i ) ? tableList.getValue( i ) : "" %>"></td>
  </tr>
 <%
 	}
@@ -153,127 +264,159 @@ for( Iterator<JCoField> i= tableList.iterator(); i.hasNext(); )
 </logic:notEmpty>
 <hr/>
 
+<!-- changingList -->
 <logic:notEmpty name="changingList" scope="request">
+<jsp:useBean id="changingList" scope="request" type="com.sap.conn.jco.JCoParameterList"/>
+<%
+JCoListMetaData md= changingList.getListMetaData();
+%><p><%=md.getName() %>(<%=md.getFieldCount() %>)</p>
 <table border="1">
  <tr>
   <th>Name</th>
-  <th>Name</th>
+  <th>Description</th>
   <th>ClassName</th>
+  <th>AbapObject</th>
+  <th>Changing</th>
+  <th>Exception</th>
+  <th>Export</th>
+  <th>Import</th>
+  <th>NestedType1Structure</th>
+  <th>Optional</th>
   <th>Value</th>
  </tr>
 <%
-JCoParameterList	changingList= (JCoParameterList)request.getAttribute( "changingList" );
-for( Iterator<JCoField> i= changingList.iterator(); i.hasNext(); )
+for( int i= 0; i < md.getFieldCount(); i++ )
 {
-	JCoField	field= i.next();
-	if( field.isTable() )
+%> <tr>
+  <td><%=md.getName( i ) %></td>
+  <td><%=md.getDescription( i ) %></td>
+  <td><%=md.getClassNameOfField( i ) %></td>
+  <td><%=md.isAbapObject( i )?"○":"" %></td>
+  <td><%=md.isChanging( i )?"○":"" %></td>
+  <td><%=md.isException( i )?"○":"" %></td>
+  <td><%=md.isExport( i )?"○":"" %></td>
+  <td><%=md.isImport( i )?"○":"" %></td>
+  <td><%=md.isNestedType1Structure( i ) ?"○":"" %></td>
+  <td><%=md.isOptional( i )?"○":"" %></td>
+  <td>
+<%
+	if( md.isTable( i ) )
 	{//	JCoTable
-		JCoTable	table= field.getTable();
-			for( Iterator<JCoField>	i2= table.iterator(); i2.hasNext(); )
-			{
-				JCoField	field2= i2.next();
-%> <tr>
-  <td><%=field.getName() %></td>
-  <td><%=field2.getName() %></td>
-  <td><%=field2.getClassNameOfValue() %></td>
-  <td><%=field2.isInitialized() ? field2.getValue() : "" %></td>
- </tr>
+		JCoTable	table= changingList.getTable( i );
+%>  <%=table %>
 <%
-			}
 	}
-	else if( field.isStructure() )
+	else if( md.isStructure( i ) )
 	{//	JCoStructure
-		JCoStructure	strusture= field.getStructure();
-			for( Iterator<JCoField>	i2= strusture.iterator(); i2.hasNext(); )
-			{
-				JCoField	field2= i2.next();
-%> <tr>
-  <td><%=field.getName() %></td>
-  <td><%=field2.getName() %></td>
-  <td><%=field2.getClassNameOfValue() %></td>
-  <td><%=field2.isInitialized() ? field2.getValue() : "" %></td>
- </tr>
+		JCoStructure	strusture= changingList.getStructure( i );
+%>   <table border="1">
 <%
-			}
+		for( Iterator<JCoField> it= strusture.iterator(); it.hasNext(); )
+		{
+			JCoField	field= it.next();
+%>    <tr>
+     <td><%=field.getName() %></td>
+     <td><%=field.getDescription() %></td>
+     <td><%=field.getClassNameOfValue() %></td>
+     <td><%=field.isInitialized() ? field.getValue() : "" %></td>
+    </tr>
+<%
+		}
+%>   </table>
+<%
 	}
 	else
 	{
-%> <tr>
-  <td><%=field.getName() %></td>
-  <td></td>
-  <td><%=field.getClassNameOfValue() %></td>
-  <td><%=field.isInitialized() ? field.getValue() : "" %></td>
- </tr>
+%>  <%=changingList.isInitialized( i ) ? changingList.getValue( i ) : "" %>
 <%
 	}
+%>  </td>
+ </tr>
+<%
 }
 %></table>
 </logic:notEmpty>
 <hr/>
 
-<logic:notEmpty name="exoprtList" scope="request">
+<!-- exportList -->
+<logic:notEmpty name="exportList" scope="request">
+<jsp:useBean id="exportList" scope="request" type="com.sap.conn.jco.JCoParameterList"/>
+<%
+JCoListMetaData md= exportList.getListMetaData();
+%><p><%=md.getName() %>(<%=md.getFieldCount() %>)</p>
 <table border="1">
  <tr>
   <th>Name</th>
-  <th>Name</th>
+  <th>Description</th>
   <th>ClassName</th>
+  <th>AbapObject</th>
+  <th>Changing</th>
+  <th>Exception</th>
+  <th>Export</th>
+  <th>Import</th>
+  <th>NestedType1Structure</th>
+  <th>Optional</th>
   <th>Value</th>
  </tr>
 <%
-JCoParameterList	exoprtList= (JCoParameterList)request.getAttribute( "exoprtList" );
-for( Iterator<JCoField> i= exoprtList.iterator(); i.hasNext(); )
+for( int i= 0; i < md.getFieldCount(); i++ )
 {
-	JCoField	field= i.next();
-	if( field.isTable() )
+%> <tr>
+  <td><%=md.getName( i ) %></td>
+  <td><%=md.getDescription( i ) %></td>
+  <td><%=md.getClassNameOfField( i ) %></td>
+  <td><%=md.isAbapObject( i )?"○":"" %></td>
+  <td><%=md.isChanging( i )?"○":"" %></td>
+  <td><%=md.isException( i )?"○":"" %></td>
+  <td><%=md.isExport( i )?"○":"" %></td>
+  <td><%=md.isImport( i )?"○":"" %></td>
+  <td><%=md.isNestedType1Structure( i ) ?"○":"" %></td>
+  <td><%=md.isOptional( i )?"○":"" %></td>
+  <td>
+<%
+	if( md.isTable( i ) )
 	{//	JCoTable
-		JCoTable	table= field.getTable();
-			for( Iterator<JCoField>	i2= table.iterator(); i2.hasNext(); )
-			{
-				JCoField	field2= i2.next();
-%> <tr>
-  <td><%=field.getName() %></td>
-  <td><%=field2.getName() %></td>
-  <td><%=field2.getClassNameOfValue() %></td>
-  <td><%=field2.isInitialized() ? field2.getValue() : "" %></td>
- </tr>
+		JCoTable	table= exportList.getTable( i );
+%>  <%=table %>
 <%
-			}
 	}
-	else if( field.isStructure() )
+	else if( md.isStructure( i ) )
 	{//	JCoStructure
-		JCoStructure	strusture= field.getStructure();
-			for( Iterator<JCoField>	i2= strusture.iterator(); i2.hasNext(); )
-			{
-				JCoField	field2= i2.next();
-%> <tr>
-  <td><%=field.getName() %></td>
-  <td><%=field2.getName() %></td>
-  <td><%=field2.getClassNameOfValue() %></td>
-  <td><%=field2.isInitialized() ? field2.getValue() : "" %></td>
- </tr>
+		JCoStructure	strusture= exportList.getStructure( i );
+%>   <table border="1">
 <%
-			}
+		for( Iterator<JCoField> it= strusture.iterator(); it.hasNext(); )
+		{
+			JCoField	field= it.next();
+%>    <tr>
+     <td><%=field.getName() %></td>
+     <td><%=field.getDescription() %></td>
+     <td><%=field.getClassNameOfValue() %></td>
+     <td><%=field.isInitialized() ? field.getValue() : "" %></td>
+    </tr>
+<%
+		}
+%>   </table>
+<%
 	}
 	else
 	{
-%> <tr>
-  <td><%=field.getName() %></td>
-  <td></td>
-  <td><%=field.getClassNameOfValue() %></td>
-  <td><%=field.isInitialized() ? field.getValue() : "" %></td>
- </tr>
+%>  <%=exportList.isInitialized( i ) ? exportList.getValue( i ) : "" %>
 <%
 	}
+%>  </td>
+ </tr>
+<%
 }
 %></table>
 </logic:notEmpty>
 <hr/>
 
 <%
-JCoDestination	destination= (JCoDestination)session.getAttribute( Login.SESS_ATTR_NAME_AUTH );
-if( destination != null )
+DestinationAuth	auth= (DestinationAuth)session.getAttribute( Login.SESS_ATTR_NAME_AUTH );
+if( auth != null )
 {
-%><textarea style="width:100%; height:20em;"><%=destination.getAttributes().getSSOTicket() %></textarea>
+%><textarea style="width:100%; height:20em;"><%=auth.getDestination().getAttributes().getSSOTicket() %></textarea>
 <%
 }
 %>

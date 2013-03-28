@@ -54,6 +54,7 @@
 		<form-bean name="FunctionForm"
 				type="org.apache.struts.validator.DynaValidatorForm">
 			<form-property name="functionName" type="java.lang.String" />
+			<form-property name="flgCommit" type="java.lang.String" initial="false" />
 		</form-bean>
 
 <!-- sample form bean descriptor for a DynaActionForm
@@ -115,12 +116,20 @@
             scope="request"
             name="LoginForm"
             >
-            <forward name="APL_OK" path="/viewFunction.jsp" />
+            <forward name="APL_OK" path="/viewFunction.jsp" redirect="true"/>
             <forward name="APL_ERR" path="/jcoLogin.jsp" />
         </action>
         <action path="/getFunction"
             type="jp.co.ksi.eip.commons.struts.InvokeAction"
             parameter="jp.co.ksi.sap.incubator.bl.GetFunction"
+            scope="request"
+            name="FunctionForm"
+            >
+            <forward name="APL_OK" path="/viewFunction.jsp" />
+        </action>
+        <action path="/execFunction"
+            type="jp.co.ksi.eip.commons.struts.InvokeAction"
+            parameter="jp.co.ksi.sap.incubator.bl.ExecFunction"
             scope="request"
             name="FunctionForm"
             >
@@ -137,7 +146,7 @@
 
 <!-- ======================================== Message Resources Definitions -->
 
-    <message-resources parameter="jp.co.ksi.testruts.Resources"
+    <message-resources parameter="jp.co.ksi.sap.incubator.Resources"
                        factory="jp.co.ksi.eip.commons.struts.KsiMessageResourcesFactory"/>
 
 

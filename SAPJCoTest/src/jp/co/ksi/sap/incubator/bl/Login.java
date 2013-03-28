@@ -11,14 +11,13 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.DynaActionForm;
 
-import com.sap.conn.jco.JCoCustomDestination;
-import com.sap.conn.jco.JCoCustomDestination.UserData;
 import com.sap.conn.jco.JCoDestination;
 import com.sap.conn.jco.JCoDestinationManager;
 
+import jp.co.ksi.eip.commons.servlet.CheckAuthFilter;
 import jp.co.ksi.eip.commons.struts.IStruts;
 import jp.co.ksi.eip.commons.struts.InvokeAction;
-import jp.co.ksi.sap.incubator.Auth;
+import jp.co.ksi.sap.incubator.DestinationAuth;
 
 /**
  * SAPへのログイン処理を行います。
@@ -38,11 +37,11 @@ import jp.co.ksi.sap.incubator.Auth;
  * </pre>
  * @author kac
  * @since 2013/03/15
- * @version 2013/03/18
+ * @version 2013/03/27
  */
 public class Login implements IStruts
 {
-	public static final String SESS_ATTR_NAME_AUTH= "auth";
+	public static final String SESS_ATTR_NAME_AUTH= CheckAuthFilter.SESS_ATTR_NAME_AUTH;
 	
 	private static Logger	log= Logger.getLogger( Login.class );
 
@@ -70,9 +69,17 @@ public class Login implements IStruts
 			//	SSOチケットを取得する
 			JCoDestination	destination= JCoDestinationManager.getDestination( type+ ":"+ host+ ":"+ systemNumber +":"+ clientNumber +":"+ uid +":"+ pwd  );
 			destination.ping();
-			//	destinationをセッションに保存する
+			
+			//	セッションを初期化する
 			HttpSession	session= request.getSession();
-			session.setAttribute( SESS_ATTR_NAME_AUTH, destination );
+			session.invalidate();
+			session= request.getSession();
+			
+			//	authを生成して、セッションに保存する
+			DestinationAuth	auth= new DestinationAuth();
+			auth.setDestination( destination );
+			auth.setUid( uid );
+			session.setAttribute( SESS_ATTR_NAME_AUTH, auth );
 
 			log.info( "destinaion ok. "+ type +":"+ host+ ":"+ systemNumber +":"+ clientNumber +":"+ uid );
 			return APL_OK;
