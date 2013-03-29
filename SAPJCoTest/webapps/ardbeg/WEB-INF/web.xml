@@ -25,7 +25,7 @@
    </init-param>
    <init-param>
     <param-name>excludeURL</param-name>
-    <param-value>.*/jcoLogin.jsp|.*/login.do|.*/check.jsp</param-value>
+    <param-value>.*/jcoLogin.jsp|.*/login.do|.*/error.jsp|.*/check.jsp</param-value>
    </init-param>
   </filter>
 

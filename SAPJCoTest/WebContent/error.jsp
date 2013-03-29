@@ -13,6 +13,7 @@
 <%@ taglib uri="struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="struts-logic.tld" prefix="logic" %>
 <%@ taglib uri="struts-html.tld" prefix="html" %>
+<!-- error.jsp -->
 <%--
 エラー画面
 2008/04/08 多言語対応

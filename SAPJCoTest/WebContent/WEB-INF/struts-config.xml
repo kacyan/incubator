@@ -134,6 +134,7 @@
             name="FunctionForm"
             >
             <forward name="APL_OK" path="/viewFunction.jsp" />
+            <forward name="APL_ERR" path="/viewFunction.jsp" />
         </action>
 
     </action-mappings>

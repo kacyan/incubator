@@ -21,7 +21,7 @@
 <%@ taglib uri="struts-logic.tld" prefix="logic" %>
 <%--
 viewFunction.jsp
-2013/03/28
+2013/03/29
  --%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <jsp:useBean id="appConfig" beanName="appConfig" type="java.util.Properties" scope="application"/>
@@ -57,13 +57,13 @@ JCoListMetaData md= importList.getListMetaData();
   <th>Name</th>
   <th>Description</th>
   <th>ClassName</th>
-  <th>AbapObject</th>
-  <th>Changing</th>
-  <th>Exception</th>
-  <th>Export</th>
-  <th>Import</th>
-  <th>NestedType1Structure</th>
-  <th>Optional</th>
+  <th style="width:1em;font-size:80%;min-width:1em; word-break:break-all;">AbapObj</th>
+  <th style="width:1em;font-size:80%;min-width:1em; word-break:break-all;">Changing</th>
+  <th style="width:1em;font-size:80%;min-width:1em; word-break:break-all;">Exception</th>
+  <th style="width:1em;font-size:80%;min-width:1em; word-break:break-all;">Export</th>
+  <th style="width:1em;font-size:80%;min-width:1em; word-break:break-all;">Import</th>
+  <th style="width:1em;font-size:80%;min-width:1em; word-break:break-all;">Nested...</th>
+  <th style="width:1em;font-size:80%;min-width:1em; word-break:break-all;">Optional</th>
   <th>Value</th>
  </tr>
 <%
@@ -73,13 +73,13 @@ for( int i= 0; i < md.getFieldCount(); i++ )
   <td><%=md.getName( i ) %></td>
   <td><%=md.getDescription( i ) %></td>
   <td><%=md.getClassNameOfField( i ) %></td>
-  <td><%=md.isAbapObject( i )?"○":"" %></td>
-  <td><%=md.isChanging( i )?"○":"" %></td>
-  <td><%=md.isException( i )?"○":"" %></td>
-  <td><%=md.isExport( i )?"○":"" %></td>
-  <td><%=md.isImport( i )?"○":"" %></td>
-  <td><%=md.isNestedType1Structure( i ) ?"○":"" %></td>
-  <td><%=md.isOptional( i )?"○":"" %></td>
+  <td><%=md.isAbapObject( i )?"○":"&nbsp;" %></td>
+  <td><%=md.isChanging( i )?"○":"&nbsp;" %></td>
+  <td><%=md.isException( i )?"○":"&nbsp;" %></td>
+  <td><%=md.isExport( i )?"○":"&nbsp;" %></td>
+  <td><%=md.isImport( i )?"○":"&nbsp;" %></td>
+  <td><%=md.isNestedType1Structure( i ) ?"○":"&nbsp;" %></td>
+  <td><%=md.isOptional( i )?"○":"&nbsp;" %></td>
   <td>
 <%
 	if( md.isTable( i ) )
@@ -143,13 +143,13 @@ JCoListMetaData md= tableList.getListMetaData();
   <th>Name</th>
   <th>Description</th>
   <th>ClassName</th>
-  <th>AbapObject</th>
-  <th>Changing</th>
-  <th>Exception</th>
-  <th>Export</th>
-  <th>Import</th>
-  <th>NestedType1Structure</th>
-  <th>Optional</th>
+  <th style="width:1em;font-size:80%;min-width:1em; word-break:break-all;">AbapObj</th>
+  <th style="width:1em;font-size:80%;min-width:1em; word-break:break-all;">Changing</th>
+  <th style="width:1em;font-size:80%;min-width:1em; word-break:break-all;">Exception</th>
+  <th style="width:1em;font-size:80%;min-width:1em; word-break:break-all;">Export</th>
+  <th style="width:1em;font-size:80%;min-width:1em; word-break:break-all;">Import</th>
+  <th style="width:1em;font-size:80%;min-width:1em; word-break:break-all;">Nested...</th>
+  <th style="width:1em;font-size:80%;min-width:1em; word-break:break-all;">Optional</th>
   <th>Value</th>
  </tr>
 <%
@@ -165,13 +165,13 @@ for( int i= 0; i < md.getFieldCount(); i++ )
   <td><%=md.getClassNameOfField( i ) %><br/>
    <%=table.getFieldCount() %>, <%=table.getNumColumns() %>, <%=table.getNumRows() %>
   </td>
-  <td><%=md.isAbapObject( i )?"○":"" %></td>
-  <td><%=md.isChanging( i )?"○":"" %></td>
-  <td><%=md.isException( i )?"○":"" %></td>
-  <td><%=md.isExport( i )?"○":"" %></td>
-  <td><%=md.isImport( i )?"○":"" %></td>
-  <td><%=md.isNestedType1Structure( i ) ?"○":"" %></td>
-  <td><%=md.isOptional( i )?"○":"" %></td>
+  <td><%=md.isAbapObject( i )?"○":"&nbsp;" %></td>
+  <td><%=md.isChanging( i )?"○":"&nbsp;" %></td>
+  <td><%=md.isException( i )?"○":"&nbsp;" %></td>
+  <td><%=md.isExport( i )?"○":"&nbsp;" %></td>
+  <td><%=md.isImport( i )?"○":"&nbsp;" %></td>
+  <td><%=md.isNestedType1Structure( i ) ?"○":"&nbsp;" %></td>
+  <td><%=md.isOptional( i )?"○":"&nbsp;" %></td>
   <td colspan="2">
    <table border="1">
     <tr>
@@ -227,13 +227,13 @@ for( int i= 0; i < md.getFieldCount(); i++ )
 %> <tr>
   <td><%=md.getName( i ) %></td>
   <td><%=md.getDescription( i ) %></td>
-  <td><%=md.isAbapObject( i )?"○":"" %></td>
-  <td><%=md.isChanging( i )?"○":"" %></td>
-  <td><%=md.isException( i )?"○":"" %></td>
-  <td><%=md.isExport( i )?"○":"" %></td>
-  <td><%=md.isImport( i )?"○":"" %></td>
-  <td><%=md.isNestedType1Structure( i ) ?"○":"" %></td>
-  <td><%=md.isOptional( i )?"○":"" %></td>
+  <td><%=md.isAbapObject( i )?"○":"&nbsp;" %></td>
+  <td><%=md.isChanging( i )?"○":"&nbsp;" %></td>
+  <td><%=md.isException( i )?"○":"&nbsp;" %></td>
+  <td><%=md.isExport( i )?"○":"&nbsp;" %></td>
+  <td><%=md.isImport( i )?"○":"&nbsp;" %></td>
+  <td><%=md.isNestedType1Structure( i ) ?"○":"&nbsp;" %></td>
+  <td><%=md.isOptional( i )?"○":"&nbsp;" %></td>
   <td><%=field.getName() %></td>
   <td><%=field.getDescription() %></td>
   <td><%=field.getClassNameOfValue() %></td>
@@ -248,13 +248,13 @@ for( int i= 0; i < md.getFieldCount(); i++ )
   <td><%=md.getName( i ) %></td>
   <td><%=md.getDescription( i ) %></td>
   <td><%=md.getClassNameOfField( i ) %></td>
-  <td><%=md.isAbapObject( i )?"○":"" %></td>
-  <td><%=md.isChanging( i )?"○":"" %></td>
-  <td><%=md.isException( i )?"○":"" %></td>
-  <td><%=md.isExport( i )?"○":"" %></td>
-  <td><%=md.isImport( i )?"○":"" %></td>
-  <td><%=md.isNestedType1Structure( i ) ?"○":"" %></td>
-  <td><%=md.isOptional( i )?"○":"" %></td>
+  <td><%=md.isAbapObject( i )?"○":"&nbsp;" %></td>
+  <td><%=md.isChanging( i )?"○":"&nbsp;" %></td>
+  <td><%=md.isException( i )?"○":"&nbsp;" %></td>
+  <td><%=md.isExport( i )?"○":"&nbsp;" %></td>
+  <td><%=md.isImport( i )?"○":"&nbsp;" %></td>
+  <td><%=md.isNestedType1Structure( i ) ?"○":"&nbsp;" %></td>
+  <td><%=md.isOptional( i )?"○":"&nbsp;" %></td>
   <td><input type="text" name="<%=md.getName( i ) %>" value="<%=tableList.isInitialized( i ) ? tableList.getValue( i ) : "" %>"></td>
  </tr>
 <%
@@ -275,13 +275,13 @@ JCoListMetaData md= changingList.getListMetaData();
   <th>Name</th>
   <th>Description</th>
   <th>ClassName</th>
-  <th>AbapObject</th>
-  <th>Changing</th>
-  <th>Exception</th>
-  <th>Export</th>
-  <th>Import</th>
-  <th>NestedType1Structure</th>
-  <th>Optional</th>
+  <th style="width:1em;font-size:80%;min-width:1em; word-break:break-all;">AbapObj</th>
+  <th style="width:1em;font-size:80%;min-width:1em; word-break:break-all;">Changing</th>
+  <th style="width:1em;font-size:80%;min-width:1em; word-break:break-all;">Exception</th>
+  <th style="width:1em;font-size:80%;min-width:1em; word-break:break-all;">Export</th>
+  <th style="width:1em;font-size:80%;min-width:1em; word-break:break-all;">Import</th>
+  <th style="width:1em;font-size:80%;min-width:1em; word-break:break-all;">Nested...</th>
+  <th style="width:1em;font-size:80%;min-width:1em; word-break:break-all;">Optional</th>
   <th>Value</th>
  </tr>
 <%
@@ -291,13 +291,13 @@ for( int i= 0; i < md.getFieldCount(); i++ )
   <td><%=md.getName( i ) %></td>
   <td><%=md.getDescription( i ) %></td>
   <td><%=md.getClassNameOfField( i ) %></td>
-  <td><%=md.isAbapObject( i )?"○":"" %></td>
-  <td><%=md.isChanging( i )?"○":"" %></td>
-  <td><%=md.isException( i )?"○":"" %></td>
-  <td><%=md.isExport( i )?"○":"" %></td>
-  <td><%=md.isImport( i )?"○":"" %></td>
-  <td><%=md.isNestedType1Structure( i ) ?"○":"" %></td>
-  <td><%=md.isOptional( i )?"○":"" %></td>
+  <td><%=md.isAbapObject( i )?"○":"&nbsp;" %></td>
+  <td><%=md.isChanging( i )?"○":"&nbsp;" %></td>
+  <td><%=md.isException( i )?"○":"&nbsp;" %></td>
+  <td><%=md.isExport( i )?"○":"&nbsp;" %></td>
+  <td><%=md.isImport( i )?"○":"&nbsp;" %></td>
+  <td><%=md.isNestedType1Structure( i ) ?"○":"&nbsp;" %></td>
+  <td><%=md.isOptional( i )?"○":"&nbsp;" %></td>
   <td>
 <%
 	if( md.isTable( i ) )
@@ -349,13 +349,13 @@ JCoListMetaData md= exportList.getListMetaData();
   <th>Name</th>
   <th>Description</th>
   <th>ClassName</th>
-  <th>AbapObject</th>
-  <th>Changing</th>
-  <th>Exception</th>
-  <th>Export</th>
-  <th>Import</th>
-  <th>NestedType1Structure</th>
-  <th>Optional</th>
+  <th style="width:1em;font-size:80%;min-width:1em; word-break:break-all;">AbapObj</th>
+  <th style="width:1em;font-size:80%;min-width:1em; word-break:break-all;">Changing</th>
+  <th style="width:1em;font-size:80%;min-width:1em; word-break:break-all;">Exception</th>
+  <th style="width:1em;font-size:80%;min-width:1em; word-break:break-all;">Export</th>
+  <th style="width:1em;font-size:80%;min-width:1em; word-break:break-all;">Import</th>
+  <th style="width:1em;font-size:80%;min-width:1em; word-break:break-all;">Nested...</th>
+  <th style="width:1em;font-size:80%;min-width:1em; word-break:break-all;">Optional</th>
   <th>Value</th>
  </tr>
 <%
@@ -365,13 +365,13 @@ for( int i= 0; i < md.getFieldCount(); i++ )
   <td><%=md.getName( i ) %></td>
   <td><%=md.getDescription( i ) %></td>
   <td><%=md.getClassNameOfField( i ) %></td>
-  <td><%=md.isAbapObject( i )?"○":"" %></td>
-  <td><%=md.isChanging( i )?"○":"" %></td>
-  <td><%=md.isException( i )?"○":"" %></td>
-  <td><%=md.isExport( i )?"○":"" %></td>
-  <td><%=md.isImport( i )?"○":"" %></td>
-  <td><%=md.isNestedType1Structure( i ) ?"○":"" %></td>
-  <td><%=md.isOptional( i )?"○":"" %></td>
+  <td><%=md.isAbapObject( i )?"○":"&nbsp;" %></td>
+  <td><%=md.isChanging( i )?"○":"&nbsp;" %></td>
+  <td><%=md.isException( i )?"○":"&nbsp;" %></td>
+  <td><%=md.isExport( i )?"○":"&nbsp;" %></td>
+  <td><%=md.isImport( i )?"○":"&nbsp;" %></td>
+  <td><%=md.isNestedType1Structure( i ) ?"○":"&nbsp;" %></td>
+  <td><%=md.isOptional( i )?"○":"&nbsp;" %></td>
   <td>
 <%
 	if( md.isTable( i ) )

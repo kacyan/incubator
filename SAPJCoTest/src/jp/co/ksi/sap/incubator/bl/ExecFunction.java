@@ -16,6 +16,7 @@ import com.sap.conn.jco.JCoField;
 import com.sap.conn.jco.JCoFunction;
 import com.sap.conn.jco.JCoParameterList;
 import com.sap.conn.jco.JCoStructure;
+import com.sap.conn.jco.JCoTable;
 
 import jp.co.ksi.eip.commons.struts.InvokeAction;
 
@@ -23,7 +24,7 @@ import jp.co.ksi.eip.commons.struts.InvokeAction;
  * Functionを実行します
  * @author kac
  * @since 2013/03/26
- * @version 2013/03/28
+ * @version 2013/03/29
  * <pre>
  * [in]
  * 	functionName	String
@@ -41,8 +42,6 @@ public class ExecFunction extends BaseBL
 	private static final String BAPI_TRANSACTION_COMMIT= "BAPI_TRANSACTION_COMMIT";
 
 	private static Logger	log= Logger.getLogger( ExecFunction.class );
-
-	protected ActionMessages	errors= new ActionMessages();
 
 	@Override
 	protected String execBL( InvokeAction action, ActionForm form,
@@ -63,24 +62,26 @@ public class ExecFunction extends BaseBL
 			{
 				JCoField	field= i.next();
 				String	paramName= field.getName();
-				log.debug( paramName +" - "+ field.getClassNameOfValue() );
+				log.debug( paramName +" - "+ field.getClassNameOfValue() +" - "+ field.getLength() +" - "+ field.getDescription() );
 				if( field.isStructure() )
 				{//	構造体
 					JCoStructure	structure= field.getStructure();
 					for( Iterator<JCoField> it2= structure.iterator(); it2.hasNext(); )
-					{
+					{//	構造体の各フィールドを調べる
 						JCoField	field2= it2.next();
+						log.debug( "\t"+ field2.getClassNameOfValue() +" - "+ field2.getLength() +" - "+ field2.getDescription() );
 						String	paramValue= request.getParameter( paramName +"."+ field2.getName() );
 						if( paramValue != null )
-						{
+						{//	構造体のフィールド名に一致するパラメータがあれば、その値をセットする
 							field2.setValue( paramValue );
-							log.debug( paramName +"."+ field2.getName() +"="+ paramValue );
+							log.debug( "\t"+ paramName +"."+ field2.getName() +"="+ paramValue );
 						}
 					}
 				}
 				else if( field.isTable() )
 				{//	テーブル
-					
+					JCoTable	table= field.getTable();
+					log.debug( "cols="+ table.getNumColumns() +", rows="+ table.getNumRows() );
 				}
 				else if( field.isInitialized() )
 				{//	初期化？
@@ -90,8 +91,9 @@ public class ExecFunction extends BaseBL
 				{//	普通
 					String	paramValue= request.getParameter( paramName );
 					if( paramValue != null )
-					{
+					{//	フィールド名に一致するパラメータがあれば、その値をセットする
 						field.setValue( paramValue );
+						log.debug( "\t"+ paramName +"="+ paramValue );
 					}
 				}
 			}
@@ -112,28 +114,29 @@ public class ExecFunction extends BaseBL
 					log.debug( "commit後\n"+ function.getExportParameterList() );
 				}
 				
+				return APL_OK;
 			}
 			catch( Exception e )
 			{
 				log.error( e.toString(), e );
+				errors.add( ActionMessages.GLOBAL_MESSAGE, new ActionMessage( "BL.ERR.DEFAULT", getClass().getName(), e.toString() ) );
+				return APL_ERR;
 			}
 			finally
 			{
 				//	トランザクション終了
 				JCoContext.end( destination );
 				log.info( "isStateful="+ JCoContext.isStateful( destination ) );
+
+				JCoParameterList	tableList= function.getTableParameterList();
+				JCoParameterList	changingList= function.getChangingParameterList();
+				JCoParameterList	exportList= function.getExportParameterList();
+				log.debug( "トランザクション終了後\n"+ exportList );
+				request.setAttribute( "importList", importList );
+				request.setAttribute( "tableList", tableList );
+				request.setAttribute( "changingList", changingList );
+				request.setAttribute( "exportList", exportList );
 			}
-			
-			JCoParameterList	tableList= function.getTableParameterList();
-			JCoParameterList	changingList= function.getChangingParameterList();
-			JCoParameterList	exportList= function.getExportParameterList();
-			log.debug( "トランザクション終了後\n"+ exportList );
-			request.setAttribute( "importList", importList );
-			request.setAttribute( "tableList", tableList );
-			request.setAttribute( "changingList", changingList );
-			request.setAttribute( "exportList", exportList );
-			
-			return APL_OK;
 		}
 		catch( Exception e )
 		{//	エラー

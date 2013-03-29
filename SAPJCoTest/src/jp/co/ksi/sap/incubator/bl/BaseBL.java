@@ -20,7 +20,7 @@ import jp.co.ksi.sap.incubator.DestinationAuth;
  * B/Lの基底クラス
  * @author kac
  * @since 2013/03/28
- * @version 2013/03/28
+ * @version 2013/03/29
  */
 public abstract class BaseBL implements IStruts
 {
@@ -76,7 +76,7 @@ public abstract class BaseBL implements IStruts
 		{
 			action.saveErrors( request, errors );
 			msec= System.currentTimeMillis() - msec;
-			log.info( getClass().getName() +" "+ msec +" ["+ result +"]" );
+			log.info( "["+ auth.getUid() +"] "+ getClass().getName() +" "+ msec +"msec ["+ result +"]" );
 		}
 		return result;
 		

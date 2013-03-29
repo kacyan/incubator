@@ -1,3 +1,15 @@
+[2013/03/29] Kac
+(1)BAPIの実行を微調整した。
+　jp.co.ksi.asp.incubator.bl.BaseBL
+　jp.co.ksi.asp.incubator.bl.ExecFunction
+　WebContent/viewFunction.jsp
+(2)エラー処理を修正した。
+　WebContent/error.jsp
+　WebContent/WEB-INF/struts-config.xml
+(3)ログを微調整した。
+　WebContent/WEB-INF/webapp.properties
+　webapps/ardbeg/ardbeg.properties
+
 [2013/03/28] Kac
 (1)BAPIの実行もできるようにした。
 (2)構造体パラメータも指定できるようにした。

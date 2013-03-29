@@ -49,7 +49,7 @@
         </manifest>
     	<war destfile="${war_dir}/ardbeg/SAPTest.war"
     		basedir="${web_src}"
-    		excludes="**/CVS/**, **/web**.xml, META-INF/**, **/*.properties, WEB-INF/lib/sapjco*.*"
+    		excludes="**/CVS/**, **/web**.xml, META-INF/**, WEB-INF/lib/sapjco*.*"
     		manifest="${war_dir}/ardbeg/META-INF/MANIFEST.MF"
     		>
     		<metainf dir="${war_dir}/ardbeg/META-INF" />
