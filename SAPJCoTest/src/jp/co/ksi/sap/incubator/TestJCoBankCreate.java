@@ -1,12 +1,9 @@
 package jp.co.ksi.sap.incubator;
 
-import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import com.sap.conn.jco.JCo;
 import com.sap.conn.jco.JCoContext;
 import com.sap.conn.jco.JCoDestination;
 import com.sap.conn.jco.JCoDestinationManager;

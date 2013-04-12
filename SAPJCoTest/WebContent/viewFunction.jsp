@@ -1,3 +1,8 @@
+<%@page import="jp.co.ksi.sap.incubator.bl.LoadParameter"%>
+<%@page import="java.util.Properties"%>
+<%@page import="jp.co.ksi.eip.commons.taglib.Option"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="java.io.File"%>
 <%@page import="jp.co.ksi.sap.incubator.DestinationAuth"%>
 <%@page import="jp.co.ksi.sap.incubator.bl.Login"%>
 <%@page import="com.sap.conn.jco.JCoField"%>
@@ -15,13 +20,14 @@
 <%@ page import="com.sap.conn.jco.JCoFunction"%>
 <%@ page import="com.sap.conn.jco.JCoDestinationManager"%>
 <%@ page import="com.sap.conn.jco.JCoDestination"%>
+<%@ taglib uri="eip.tld" prefix="eip" %>
 <%@ taglib uri="ksi.tld" prefix="ksi" %>
 <%@ taglib uri="struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="struts-html.tld" prefix="html" %>
 <%@ taglib uri="struts-logic.tld" prefix="logic" %>
 <%--
 viewFunction.jsp
-2013/03/29
+2013/04/02 md.getDefault()を追加した。
  --%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <jsp:useBean id="appConfig" beanName="appConfig" type="java.util.Properties" scope="application"/>
@@ -30,7 +36,12 @@ viewFunction.jsp
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head>
 <body>
+<logic:empty name="functionName">
 <bean:parameter name="functionName" id="functionName" value=""/>
+</logic:empty>
+<logic:notEmpty name="functionName">
+<bean:define id="functionName" name="functionName"/>
+</logic:notEmpty>
 <bean:parameter name="submit" id="submit" value=""/>
 <form action="getFunction.do" method="post">
 <table>
@@ -41,11 +52,30 @@ viewFunction.jsp
 </table>
 <input type="submit" name="submit" value="getParameterList">
 </form>
+<%
+String	paramFileBase= appConfig.getProperty( LoadParameter.PARAM_FILE_BASE, "/users/kac/SAPTest/" );
+File	baseFolder= new File( paramFileBase );
+String[]	file= baseFolder.list();
+java.util.Arrays.sort( file );
+ArrayList<Option>	fileList= new ArrayList<Option>();
+fileList.add( new Option("","") );
+for( int i= 0; i < file.length; i++  )
+{
+	Option	option= new Option( file[i], file[i] );
+	fileList.add( option );
+}
+pageContext.setAttribute( "fileList", fileList );
+%>
+<bean:parameter name="paramFile" id="paramFile" value=""/>
+<html:form action="/loadParameter" method="post" >
+<eip:combobox name="fileList" paramName="paramFile" messageKey="false" selectedValue="<%=paramFile %>"/>
+<input type="submit" name="submit.loadParameter" value="パラメータ読込">
+</html:form>
 <hr/>
 <jsp:include page="inc/error.jsp" flush="true"/>
 
 <!-- importList -->
-<html:form action="/execFunction" method="post">
+<html:form action="/dispatch" method="post">
 <input type="hidden" name="functionName" value="<bean:write name="functionName"/>">
 <logic:notEmpty name="importList" scope="request">
 <jsp:useBean id="importList" scope="request" type="com.sap.conn.jco.JCoParameterList"/>
@@ -65,6 +95,7 @@ JCoListMetaData md= importList.getListMetaData();
   <th style="width:1em;font-size:80%;min-width:1em; word-break:break-all;">Nested...</th>
   <th style="width:1em;font-size:80%;min-width:1em; word-break:break-all;">Optional</th>
   <th>Value</th>
+  <th>Default</th>
  </tr>
 <%
 for( int i= 0; i < md.getFieldCount(); i++ )
@@ -110,6 +141,7 @@ for( int i= 0; i < md.getFieldCount(); i++ )
      <td><%=field.getDescription() %></td>
      <td><%=field.getClassNameOfValue() %></td>
      <td><input type="text" name="<%=md.getName( i ) %>.<%=field.getName() %>" value="<%=value %>"></td>
+     <td><%=field.getExtendedFieldMetaData() %></td>
     </tr>
 <%
 		}
@@ -118,17 +150,27 @@ for( int i= 0; i < md.getFieldCount(); i++ )
 	}
 	else
 	{
-%>   <input type="text" name="<%=md.getName( i ) %>" value="<%=importList.isInitialized( i ) ? importList.getValue( i ) : "" %>">
+		Properties	props= (Properties)request.getAttribute( "paramProperties" );
+		if( props == null )	props= new Properties();
+		String	value= request.getParameter( md.getName( i ) );
+		if( value == null )
+		{
+			value= props.getProperty( md.getName( i ), "" );
+		}
+%>   <input type="text" name="<%=md.getName( i ) %>" value="<%=value %>">
 <%
 	}
 %>  </td>
+    <td><%=md.getDefault( i ) %></td>
  </tr>
 <%
 }
 %></table>
 </logic:notEmpty>
 <html:checkbox property="flgCommit" >コミット処理を行う</html:checkbox><br/>
-<input type="submit" name="submit.execFunction" value="実行">
+<input type="submit" name="submit.execFunction" value="実行"><br/>
+paramFile:<input type="text" name="paramFile" value="">
+<input type="submit" name="submit.saveParameter" value="パラメータ保存">
 </html:form>
 <hr/>
 
@@ -151,6 +193,7 @@ JCoListMetaData md= tableList.getListMetaData();
   <th style="width:1em;font-size:80%;min-width:1em; word-break:break-all;">Nested...</th>
   <th style="width:1em;font-size:80%;min-width:1em; word-break:break-all;">Optional</th>
   <th>Value</th>
+  <th>Default</th>
  </tr>
 <%
 for( int i= 0; i < md.getFieldCount(); i++ )

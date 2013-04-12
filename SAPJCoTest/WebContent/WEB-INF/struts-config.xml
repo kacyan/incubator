@@ -55,6 +55,7 @@
 				type="org.apache.struts.validator.DynaValidatorForm">
 			<form-property name="functionName" type="java.lang.String" />
 			<form-property name="flgCommit" type="java.lang.String" initial="false" />
+			<form-property name="paramFile" type="java.lang.String" />
 		</form-bean>
 
 <!-- sample form bean descriptor for a DynaActionForm
@@ -127,9 +128,35 @@
             >
             <forward name="APL_OK" path="/viewFunction.jsp" />
         </action>
+        <action path="/dispatch"
+            type="jp.co.ksi.eip.commons.struts.DispatchAction"
+            scope="request"
+            name="FunctionForm"
+            >
+            <forward name="submit.execFunction" path="/execFunction.do" />
+            <forward name="submit.saveParameter" path="/saveParameter.do" />
+        </action>
         <action path="/execFunction"
             type="jp.co.ksi.eip.commons.struts.InvokeAction"
             parameter="jp.co.ksi.sap.incubator.bl.ExecFunction"
+            scope="request"
+            name="FunctionForm"
+            >
+            <forward name="APL_OK" path="/viewFunction.jsp" />
+            <forward name="APL_ERR" path="/viewFunction.jsp" />
+        </action>
+        <action path="/saveParameter"
+            type="jp.co.ksi.eip.commons.struts.InvokeAction"
+            parameter="jp.co.ksi.sap.incubator.bl.SaveParameter"
+            scope="request"
+            name="FunctionForm"
+            >
+            <forward name="APL_OK" path="/viewFunction.jsp" />
+            <forward name="APL_ERR" path="/viewFunction.jsp" />
+        </action>
+        <action path="/loadParameter"
+            type="jp.co.ksi.eip.commons.struts.InvokeAction"
+            parameter="jp.co.ksi.sap.incubator.bl.LoadParameter"
             scope="request"
             name="FunctionForm"
             >

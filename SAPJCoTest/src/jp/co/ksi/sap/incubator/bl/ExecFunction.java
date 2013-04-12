@@ -24,7 +24,7 @@ import jp.co.ksi.eip.commons.struts.InvokeAction;
  * Functionを実行します
  * @author kac
  * @since 2013/03/26
- * @version 2013/03/29
+ * @version 2013/04/04
  * <pre>
  * [in]
  * 	functionName	String
@@ -58,42 +58,45 @@ public class ExecFunction extends BaseBL
 			JCoFunction	commitFunction= destination.getRepository().getFunction( BAPI_TRANSACTION_COMMIT );
 			JCoFunction	function= destination.getRepository().getFunction( functionName );
 			JCoParameterList	importList= function.getImportParameterList();
-			for( Iterator<JCoField>	i= importList.iterator(); i.hasNext(); )
+			if( importList != null )
 			{
-				JCoField	field= i.next();
-				String	paramName= field.getName();
-				log.debug( paramName +" - "+ field.getClassNameOfValue() +" - "+ field.getLength() +" - "+ field.getDescription() );
-				if( field.isStructure() )
-				{//	構造体
-					JCoStructure	structure= field.getStructure();
-					for( Iterator<JCoField> it2= structure.iterator(); it2.hasNext(); )
-					{//	構造体の各フィールドを調べる
-						JCoField	field2= it2.next();
-						log.debug( "\t"+ field2.getClassNameOfValue() +" - "+ field2.getLength() +" - "+ field2.getDescription() );
-						String	paramValue= request.getParameter( paramName +"."+ field2.getName() );
-						if( paramValue != null )
-						{//	構造体のフィールド名に一致するパラメータがあれば、その値をセットする
-							field2.setValue( paramValue );
-							log.debug( "\t"+ paramName +"."+ field2.getName() +"="+ paramValue );
+				for( Iterator<JCoField>	i= importList.iterator(); i.hasNext(); )
+				{
+					JCoField	field= i.next();
+					String	paramName= field.getName();
+					log.debug( paramName +" - "+ field.getClassNameOfValue() +" - "+ field.getLength() +" - "+ field.getDescription() );
+					if( field.isStructure() )
+					{//	構造体
+						JCoStructure	structure= field.getStructure();
+						for( Iterator<JCoField> it2= structure.iterator(); it2.hasNext(); )
+						{//	構造体の各フィールドを調べる
+							JCoField	field2= it2.next();
+							log.debug( "\t"+ field2.getClassNameOfValue() +" - "+ field2.getLength() +" - "+ field2.getDescription() );
+							String	paramValue= request.getParameter( paramName +"."+ field2.getName() );
+							if( paramValue != null )
+							{//	構造体のフィールド名に一致するパラメータがあれば、その値をセットする
+								field2.setValue( paramValue );
+								log.debug( "\t"+ paramName +"."+ field2.getName() +"="+ paramValue );
+							}
 						}
 					}
-				}
-				else if( field.isTable() )
-				{//	テーブル
-					JCoTable	table= field.getTable();
-					log.debug( "cols="+ table.getNumColumns() +", rows="+ table.getNumRows() );
-				}
-				else if( field.isInitialized() )
-				{//	初期化？
-					
-				}
-				else
-				{//	普通
-					String	paramValue= request.getParameter( paramName );
-					if( paramValue != null )
-					{//	フィールド名に一致するパラメータがあれば、その値をセットする
-						field.setValue( paramValue );
-						log.debug( "\t"+ paramName +"="+ paramValue );
+					else if( field.isTable() )
+					{//	テーブル
+						JCoTable	table= field.getTable();
+						log.debug( "cols="+ table.getNumColumns() +", rows="+ table.getNumRows() );
+					}
+					else if( field.isInitialized() )
+					{//	初期化？
+						
+					}
+					else
+					{//	普通
+						String	paramValue= request.getParameter( paramName );
+						if( paramValue != null )
+						{//	フィールド名に一致するパラメータがあれば、その値をセットする
+							field.setValue( paramValue );
+							log.debug( "\t"+ paramName +"="+ paramValue );
+						}
 					}
 				}
 			}

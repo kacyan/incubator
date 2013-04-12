@@ -69,7 +69,7 @@ public abstract class BaseBL implements IStruts
 		catch( Exception e )
 		{//	B/Lで例外発生 -> エラー
 			result= APL_ERR;
-			log.error( getClass().getName(), e );
+			log.error( getClass().getName() +" - "+ form, e );
 			errors.add( ActionMessages.GLOBAL_MESSAGE, new ActionMessage( "BL.ERR.DEFAULT", getClass().getName(), e.toString() ) );
 		}
 		finally

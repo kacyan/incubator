@@ -1,3 +1,18 @@
+[2013/04/12] Kac
+(1)パラメータを保存できるようにした
+　jp.co.ksi.sap.incubator.bl.BaseBL
+　jp.co.ksi.sap.incubator.bl.ExecFunction
+　jp.co.ksi.sap.incubator.bl.LoadParameter
+　jp.co.ksi.sap.incubator.bl.SaveParameter
+　WebContent/viewFunction.jsp
+　WebContent/WEB-INF/struts-config.xml
+　WebContent/webapp.properties
+　webapps/ardbeg/WEB-INF/ardbeg.properties
+(2)ログイン時に空振りする不具合を修正した。
+　認証チェックフィルターの除外パターンを追加した
+　WebContent/WEB-INF/web.xml
+　webapps/ardbeg/WEB-INF/web.xml
+
 [2013/03/29] Kac
 (1)BAPIの実行を微調整した。
 　jp.co.ksi.asp.incubator.bl.BaseBL

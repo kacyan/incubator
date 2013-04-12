@@ -1,6 +1,7 @@
 package jp.co.ksi.sap.incubator;
 
 import java.util.Iterator;
+import java.util.Locale;
 
 import jp.co.ksi.eip.commons.util.StringUtil;
 
@@ -10,6 +11,7 @@ import com.sap.conn.jco.JCoDestination;
 import com.sap.conn.jco.JCoDestinationManager;
 import com.sap.conn.jco.JCoField;
 import com.sap.conn.jco.JCoFunction;
+import com.sap.conn.jco.JCoListMetaData;
 import com.sap.conn.jco.JCoMetaData;
 import com.sap.conn.jco.JCoParameterList;
 import com.sap.conn.jco.JCoStructure;
@@ -57,7 +59,7 @@ public class TestJCoDestination
 		String functionName = "RFC_READ_TABLE";
 		
 		SSODestinationDataProvider	provider= new SSODestinationDataProvider();
-		provider.setLang( "ja" );
+		provider.setLang( Locale.JAPANESE.getLanguage() );
 		try
 		{
 			Environment.registerDestinationDataProvider( provider );
@@ -71,6 +73,9 @@ public class TestJCoDestination
 			JCoParameterList	importParameterList= function.getImportParameterList();
 			if( importParameterList != null )
 			{
+				debugMetaData( importParameterList.getMetaData(), 0 );
+				debugListMetaData( importParameterList.getListMetaData(), 0 );
+				
 				importParameterList.setValue(  "QUERY_TABLE", "TFTIT" );
 				importParameterList.setValue( "ROWCOUNT", 50 );
 				importParameterList.setValue( "ROWSKIPS", 200 );
@@ -127,7 +132,7 @@ public class TestJCoDestination
 			String	name= md.getName( i );
 			Object	value= parameterList.getValue( name );
 			if( value instanceof JCoTable )
-			{
+			{//	テーブル
 				JCoTable table= (JCoTable)value;
 				for( Iterator<JCoField> it= table.iterator(); it.hasNext(); )
 				{
@@ -143,7 +148,7 @@ public class TestJCoDestination
 				}
 			}
 			else if( value instanceof JCoStructure )
-			{
+			{//	構造体
 				JCoStructure structure= (JCoStructure)value;
 				for( Iterator<JCoField> it= structure.iterator(); it.hasNext(); )
 				{
@@ -163,8 +168,8 @@ public class TestJCoDestination
 	 * パラメータのメタデータを表示する
 	 * @param params
 	 */
-	public static void debugMetaData( JCoMetaData md, int nest ) {
-
+	public static void debugMetaData( JCoMetaData md, int nest )
+	{
 		String	indent= StringUtil.generateText( "　", nest );
 		log.debug( indent +"md.name="+ md.getName() +", "+ md.getFieldCount() );
 
@@ -175,13 +180,45 @@ public class TestJCoDestination
 					+", recordType="+ md.getRecordTypeName(i)
 					+", className="+ md.getClassNameOfField(i)
 					+", length="+ md.getLength(i)
-					+", description="+ md.getDescription(i) );
+					+", description="+ md.getDescription(i)
+					);
 
-			if( md.isStructure(i) || md.isTable(i) )
-			{//	構造体 or テーブル
+			if( md.isStructure(i) )
+			{//	構造体
+				debugMetaData( md.getRecordMetaData(i), nest+1 );
+			}
+			else if( md.isTable(i) )
+			{//	テーブル
 				debugMetaData( md.getRecordMetaData(i), nest+1 );
 			}
 		}
 	}
 
+	
+	public static void debugListMetaData( JCoListMetaData md, int nest )
+	{
+		String	indent= StringUtil.generateText( "　", nest );
+		log.debug( indent +"md.name="+ md.getName() +", "+ md.getFieldCount() );
+		
+		for( int i= 0; i < md.getFieldCount(); i++ )
+		{
+			log.debug( indent +"name="+ md.getName(i)
+					+", type="+ md.getTypeAsString(i)
+					+", recordType="+ md.getRecordTypeName(i)
+					+", className="+ md.getClassNameOfField(i)
+					+", length="+ md.getLength(i)
+					+", description="+ md.getDescription(i)
+					+", default="+ md.getDefault(i)
+					);
+
+			if( md.isStructure(i) )
+			{//	構造体
+				debugMetaData( md.getRecordMetaData(i), nest+1 );
+			}
+			else if( md.isTable(i) )
+			{//	テーブル
+				debugMetaData( md.getRecordMetaData(i), nest+1 );
+			}
+		}
+	}
 }
