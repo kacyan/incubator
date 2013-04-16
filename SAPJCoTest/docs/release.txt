@@ -1,3 +1,10 @@
+[2013/04/16] Kac
+(1)ログ出力を見直した。
+　jp.co.ksi.sap.incubator.bl.ExecFunction
+　jp.co.ksi.sap.incubator.bl.GetFunction
+　jp.co.ksi.sap.incubator.bl.LoadParameter
+　jp.co.ksi.sap.incubator.bl.SaveParameter
+
 [2013/04/12] Kac
 (1)パラメータを保存できるようにした
 　jp.co.ksi.sap.incubator.bl.BaseBL

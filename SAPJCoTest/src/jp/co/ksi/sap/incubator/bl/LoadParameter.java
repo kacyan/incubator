@@ -24,7 +24,7 @@ import com.sap.conn.jco.JCoTable;
  * パラメータをファイルからロードする
  * @author kac
  * @since 2013/04/01
- * @version 2013/04/01
+ * @version 2013/04/16
  */
 public class LoadParameter extends GetFunction
 {
@@ -54,7 +54,7 @@ public class LoadParameter extends GetFunction
 		}
 		catch( Exception e )
 		{
-			log.error( e.toString(), e );
+			log.error( "["+ auth.getUid() +"] "+ paramFile, e );
 		}
 		finally
 		{

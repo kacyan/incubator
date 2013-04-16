@@ -19,7 +19,7 @@ import org.apache.struts.action.DynaActionForm;
  * パラメータをファイルにセーブする
  * @author kac
  * @since 2013/04/01
- * @version 2013/04/01
+ * @version 2013/04/16
  */
 public class SaveParameter extends GetFunction
 {
@@ -32,7 +32,8 @@ public class SaveParameter extends GetFunction
 		String	paramFile= dyna.getString( "paramFile" );
 		if( ( paramFile ==null ) || paramFile.equals( "" ) )
 		{//	param error
-			errors.add( ActionMessages.GLOBAL_MESSAGE, new ActionMessage( "BL.ERR.DEFAULT", getClass().getName(), "paramFile invalid" ) );
+			log.info( "["+ auth.getUid() +"] "+"paramFile invalid." );
+			errors.add( ActionMessages.GLOBAL_MESSAGE, new ActionMessage( "BL.ERR.DEFAULT", getClass().getName(), "paramFile invalid." ) );
 			return APL_ERR;
 		}
 			
@@ -62,7 +63,7 @@ public class SaveParameter extends GetFunction
 		}
 		catch( Exception e )
 		{
-			log.error( "save error. "+ paramFileBase + paramFile, e );
+			log.error( "["+ auth.getUid() +"] "+"save error. "+ paramFileBase + paramFile, e );
 			errors.add( ActionMessages.GLOBAL_MESSAGE, new ActionMessage( "BL.ERR.DEFAULT", getClass().getName(), "save error. "+ paramFileBase + paramFile ) );
 			result= APL_ERR;
 		}

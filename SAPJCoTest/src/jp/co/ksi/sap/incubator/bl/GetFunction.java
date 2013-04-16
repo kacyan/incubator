@@ -27,7 +27,7 @@ import jp.co.ksi.eip.commons.struts.InvokeAction;
  * </pre>
  * @author kac
  * @since 2013/03/18
- * @version 2013/03/28
+ * @version 2013/04/16
  * <pre>
  * 動作確認
  * BAPI_USER_GET_DETAIL	○
@@ -51,7 +51,7 @@ public class GetFunction extends BaseBL
 			JCoFunction	function= auth.getDestination().getRepository().getFunction( functionName );
 			if( function == null )
 			{
-				log.info( functionName +" not found." );
+				log.info( "["+ auth.getUid() +"] "+ functionName +" not found." );
 				errors.add( ActionMessages.GLOBAL_MESSAGE, new ActionMessage( "BL.GetFunction.ERR.001", functionName ) );
 				return APL_OK;
 			}
@@ -69,7 +69,7 @@ public class GetFunction extends BaseBL
 		}
 		catch( Exception e )
 		{//	エラー
-			log.warn( "functionName="+ functionName, e );
+			log.error( "["+ auth.getUid() +"] "+ functionName, e );
 			errors.add( ActionMessages.GLOBAL_MESSAGE, new ActionMessage( "BL.ERR.DEFAULT", getClass().getName(), e.toString() ) );
 			return APL_ERR;
 		}

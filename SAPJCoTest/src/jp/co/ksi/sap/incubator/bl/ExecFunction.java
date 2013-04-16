@@ -24,7 +24,7 @@ import jp.co.ksi.eip.commons.struts.InvokeAction;
  * Functionを実行します
  * @author kac
  * @since 2013/03/26
- * @version 2013/04/04
+ * @version 2013/04/16
  * <pre>
  * [in]
  * 	functionName	String
@@ -121,7 +121,7 @@ public class ExecFunction extends BaseBL
 			}
 			catch( Exception e )
 			{
-				log.error( e.toString(), e );
+				log.error( "["+ auth.getUid() +"] "+ functionName +" execution failed.", e );
 				errors.add( ActionMessages.GLOBAL_MESSAGE, new ActionMessage( "BL.ERR.DEFAULT", getClass().getName(), e.toString() ) );
 				return APL_ERR;
 			}
@@ -143,7 +143,7 @@ public class ExecFunction extends BaseBL
 		}
 		catch( Exception e )
 		{//	エラー
-			log.warn( "functionName="+ functionName, e );
+			log.error( "["+ auth.getUid() +"] "+ functionName +" parameter failed.", e );
 			errors.add( ActionMessages.GLOBAL_MESSAGE, new ActionMessage( "BL.ERR.DEFAULT", getClass().getName(), e.toString() ) );
 			return APL_ERR;
 		}
