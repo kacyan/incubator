@@ -1,3 +1,7 @@
+[2013/05/13] Kac
+(1)コンテキスト終了時にプロバイダを解除するようにした
+　jp.co.ksi.sap.incubator.SAPInitContextListener
+
 [2013/04/16] Kac
 (1)ログ出力を見直した。
 　jp.co.ksi.sap.incubator.bl.ExecFunction
